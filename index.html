@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Fundamentals – Section 1 | Eng. Ahmed El-khatib</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<!-- Skulpt (Python Compiler for Browser) -->
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+
+<style>
+/* =========================================
+   CSS VARIABLES & RESET (LIGHT MODE DEFAULT)
+   ========================================= */
+:root {
+  --bg:       #f8fafc;
+  --bg2:      #ffffff;
+  --bg3:      #e2e8f0;
+  --card:     #ffffff;
+  --card2:    #f1f5f9;
+  --border:   #cbd5e1;
+  --border2:  #94a3b8;
+  --accent:   #059669; /* Emerald Green */
+  --accent2:  #0284c7; /* Sky Blue */
+  --accent3:  #dc2626; /* Red */
+  --accent4:  #d97706; /* Orange */
+  --accent5:  #7c3aed; /* Purple */
+  --text:     #0f172a;
+  --text2:    #334155;
+  --text3:    #64748b;
+  --code-bg:  #0d1117; /* Always Dark for Code Blocks */
+  --glow:     rgba(5, 150, 105, 0.15);
+  --glow2:    rgba(2, 132, 199, 0.12);
+  --radius:   14px;
+  --radius2:  8px;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-code: 'Space Mono', monospace;
+  --btn-text: #ffffff;
+}
+
+/* =========================================
+   DARK MODE VARIABLES
+   ========================================= */
+:root[data-theme="dark"] {
+  --bg:       #0a0c14;
+  --bg2:      #0f1220;
+  --bg3:      #141828;
+  --card:     #161b2e;
+  --card2:    #1c2238;
+  --border:   #252d45;
+  --border2:  #2e3a58;
+  --accent:   #4fffb0;
+  --accent2:  #38d9f5;
+  --accent3:  #ff6b6b;
+  --accent4:  #ffd166;
+  --accent5:  #b388ff;
+  --text:     #e8eaf6;
+  --text2:    #8892b0;
+  --text3:    #4a5578;
+  --code-bg:  #0d1117;
+  --glow:     rgba(79,255,176,0.15);
+  --glow2:    rgba(56,217,245,0.12);
+  --btn-text: #0a0c14;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* NOISE TEXTURE OVERLAY */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* PROGRESS BAR */
+#progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  width: 0%;
+  transition: width 0.2s ease;
+  z-index: 999;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: var(--bg);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  z-index: 900;
+  padding: 0 2rem;
+  opacity: 0.95;
+  transition: background-color 0.3s;
+}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+.nav-logo {
+  font-family: var(--font-code);
+  font-size: 1.1rem;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+}
+.nav-logo span { color: var(--text2); font-weight: normal; }
+.nav-links {
+  display: flex;
+  gap: 0.2rem;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  font-family: var(--font-code);
+}
+.nav-links a:hover { color: var(--accent); background: var(--glow); }
+
+.nav-actions { display: flex; align-items: center; gap: 1rem; }
+
+/* Theme Toggle */
+.theme-toggle {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1.1rem;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); transform: rotate(15deg); }
+
+/* Points badge */
+#points-badge {
+  background: var(--card2);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 0 12px rgba(79,255,176,0.2);
+  transition: all 0.3s;
+}
+#points-badge.gained { animation: pulse-gain 0.5s ease; }
+@keyframes pulse-gain {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.15); box-shadow: 0 0 24px var(--accent); }
+}
+
+/* HERO */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 2rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: 
+    radial-gradient(ellipse 60% 50% at 50% 30%, var(--glow) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 70%, var(--glow2) 0%, transparent 50%);
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: 
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.2;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+}
+.hero-content { position: relative; z-index: 2; max-width: 780px; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--glow); border: 1px solid var(--accent); border-radius: 20px;
+  padding: 6px 18px; font-family: var(--font-code); font-size: 0.75rem;
+  color: var(--accent); margin-bottom: 2rem; letter-spacing: 0.1em;
+}
+.hero-tag::before { content: '●'; animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+h1.hero-title {
+  font-family: var(--font-head); font-size: clamp(2.4rem, 6vw, 4.5rem);
+  font-weight: 800; line-height: 1.08; margin-bottom: 1.5rem; letter-spacing: -0.02em;
+}
+.hero-title .line1 { display: block; color: var(--text); }
+.hero-title .line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, var(--accent5) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub { font-size: 1.1rem; color: var(--text2); max-width: 520px; margin: 0 auto 2.5rem; font-weight: 300; }
+.btn-start {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--accent); color: var(--btn-text);
+  font-family: var(--font-head); font-weight: 700; font-size: 1rem;
+  padding: 14px 36px; border-radius: 50px; text-decoration: none;
+  border: none; cursor: pointer; transition: all 0.3s;
+  box-shadow: 0 0 30px var(--glow);
+}
+.btn-start:hover { transform: translateY(-3px); box-shadow: 0 0 50px var(--accent); }
+.floating-code {
+  position: absolute;
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  color: var(--text3);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.fc1 { top: 20%; left: 5%; animation: float1 6s ease-in-out infinite; }
+.fc2 { top: 60%; left: 3%; animation: float2 8s ease-in-out infinite; }
+.fc3 { top: 25%; right: 5%; animation: float1 7s ease-in-out infinite 1s; }
+.fc4 { top: 70%; right: 3%; animation: float2 5s ease-in-out infinite 2s; }
+@keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+@keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(12px)} }
+
+/* SECTIONS */
+.section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-header { margin-bottom: 2rem; }
+.section-num { font-family: var(--font-code); font-size: 0.75rem; color: var(--accent); letter-spacing: 0.15em; display: block; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-head); font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+.section-desc { color: var(--text2); font-size: 1.05rem; max-width: 600px; font-weight: 300; }
+.section-sep { border: none; border-top: 1px solid var(--border); max-width: 1100px; margin: 0 auto; }
+.section-alt { background: var(--bg2); }
+
+/* EXPLANATION BOX (THEORY CHECK) */
+.expl-box {
+  background: var(--card);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+.expl-header {
+  font-family: var(--font-head); font-weight: 700; font-size: 1.1rem;
+  color: var(--accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;
+}
+.expl-body { font-size: 0.95rem; color: var(--text2); line-height: 1.7; }
+.expl-body p { margin-bottom: 0.5rem; }
+.expl-body ul { padding-left: 1.5rem; margin-bottom: 0.5rem; }
+.expl-body li { margin-bottom: 0.3rem; }
+
+/* DEMO BOX */
+.demo-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem;}
+.demo-header { background: var(--card2); border-bottom: 1px solid var(--border); padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-code); font-size: 0.75rem; color: var(--text2); }
+.demo-dots { display: flex; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-r { background: #ff5f57; } .dot-y { background: #febc2e; } .dot-g { background: #28c840; }
+.demo-title { margin-left: 8px; }
+.demo-body { padding: 1.5rem; }
+
+/* INPUTS & BUTTONS */
+input[type="text"], input[type="number"], textarea, select {
+  background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius2);
+  color: var(--text); font-family: var(--font-code); font-size: 0.9rem;
+  padding: 10px 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
+}
+input:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px var(--glow2); }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+  background: var(--card2); border: 1px solid var(--border2); border-radius: var(--radius2);
+  color: var(--text); font-family: var(--font-body); font-size: 0.9rem; font-weight: 600;
+  padding: 10px 20px; cursor: pointer; transition: all 0.2s;
+}
+.btn:hover { border-color: var(--accent2); color: var(--accent2); }
+.btn-accent { background: var(--accent); border-color: transparent; color: var(--btn-text); }
+.btn-accent:hover { filter: brightness(1.1); transform: translateY(-1px); color: var(--btn-text); border-color: transparent;}
+.btn-sm { padding: 7px 14px; font-size: 0.8rem; }
+
+/* CODE BLOCK (ALWAYS DARK) */
+.code-block {
+  background: #0d1117; border: 1px solid var(--border); border-radius: var(--radius2);
+  padding: 1.25rem 1.5rem; font-family: var(--font-code); font-size: 0.85rem; line-height: 1.7;
+  overflow-x: auto; position: relative; color: #e8eaf6;
+}
+.code-block .kw { color: #d946ef; } /* Pink/Purple */
+.code-block .fn { color: #0ea5e9; } /* Blue */
+.code-block .str { color: #10b981; } /* Green */
+.code-block .num { color: #f59e0b; } /* Orange */
+.code-block .cmt { color: #64748b; font-style: italic; }
+.code-block .var { color: #e8eaf6; }
+
+/* SVG STYLING FOR FLOWCHARTS (Theme Aware) */
+svg.flowchart .fc-bg { fill: var(--card2); stroke: var(--border); stroke-width: 2; transition: all 0.3s;}
+svg.flowchart .fc-text { fill: var(--text2); font-family: 'Space Mono', monospace; transition: all 0.3s;}
+svg.flowchart .fc-line { stroke: var(--border); stroke-width: 2; transition: stroke 0.3s;}
+svg.flowchart .fc-arrow { fill: var(--border); transition: fill 0.3s;}
+.fc-shape { transition: all 0.4s; cursor: default; }
+.fc-shape.active .fc-bg { fill: var(--glow) !important; stroke: var(--accent) !important; }
+.fc-shape.active .fc-text { fill: var(--accent) !important; font-weight: bold;}
+.fc-shape.done .fc-bg { fill: var(--glow2) !important; stroke: var(--accent2) !important; opacity: 0.7;}
+
+/* VARIOUS SPECIFIC STYLES COMPRESSED */
+.ipo-flow { display: flex; align-items: center; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
+.ipo-box { flex: 1; min-width: 140px; text-align: center; padding: 1.5rem 1rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--card2);}
+.ipo-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem;}
+.ipo-label { font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; }
+.ipo-arrow { font-size: 1.5rem; color: var(--text3); }
+.ipo-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+@media(max-width:600px){.ipo-demo{grid-template-columns:1fr}}
+#ipo-output-area { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius2); padding: 1rem; font-family: var(--font-code); min-height: 80px; }
+.ipo-steps { display: flex; flex-direction: column; gap: 0.5rem; }
+.ipo-step { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.9rem; border-radius: 8px; background: var(--bg3); border: 1px solid var(--border); font-size: 0.85rem; opacity: 0.4; transition: all 0.4s; }
+.ipo-step.active { opacity: 1; border-color: var(--accent); background: var(--glow); }
+.ipo-step.done   { opacity: 0.7; border-color: var(--accent2); }
+
+.choice-btn { background: var(--card); border: 2px solid var(--border); border-radius: var(--radius2); color: var(--text); padding: 0.9rem; cursor: pointer; text-align: left; transition: all 0.2s; width: 100%;}
+.choice-btn:hover  { border-color: var(--accent2); }
+.choice-btn.correct{ border-color: var(--accent); background: var(--glow); color: var(--accent); }
+.choice-btn.wrong  { border-color: var(--accent3); background: rgba(239,68,68,0.1); color: var(--accent3); }
+
+.cv-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+@media(max-width:600px){.cv-compare{grid-template-columns:1fr}}
+.cv-box { border-radius: var(--radius); padding: 1.5rem; border: 2px solid var(--border); background: var(--card); }
+
+.ftab { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius2); color: var(--text2); padding: 8px 18px; cursor: pointer; transition: all 0.2s; font-weight: 600;}
+.ftab.active { background: var(--accent); border-color: var(--accent); color: var(--btn-text); }
+.flowchart-panel { display: none; }
+.flowchart-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media(max-width:700px){.flowchart-panel.active{grid-template-columns:1fr}}
+.fc-visual { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; display: flex; align-items: center; justify-content: center; }
+.fc-pseudo { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.fc-pseudo-header { background: var(--card2); border-bottom: 1px solid var(--border); padding: 0.6rem 1rem; font-family: var(--font-code); font-size: 0.75rem; color: var(--text2); }
+.pseudo-line { padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.8rem;}
+.pseudo-line.active { background: var(--glow); color: var(--accent); border-left: 3px solid var(--accent); }
+
+.mem-sim { display: grid; grid-template-columns: 1fr 1.3fr; gap: 1.5rem; }
+@media(max-width:650px){.mem-sim{grid-template-columns:1fr}}
+.mem-area { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; min-height: 200px; }
+.mem-slot { background: var(--card); border: 1px solid var(--border2); border-radius: var(--radius2); padding: 0.75rem 1rem; min-width: 90px; text-align: center; position: relative; }
+.mem-var-name { font-family: var(--font-code); font-size: 0.72rem; color: var(--accent2); margin-bottom: 0.4rem; }
+.mem-var-val { font-family: var(--font-code); font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.mem-log { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius2); padding: 0.75rem 1rem; font-family: var(--font-code); font-size: 0.78rem; max-height: 120px; overflow-y: auto; }
+
+.type-detector { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media(max-width:600px){.type-detector{grid-template-columns:1fr}}
+.type-icon-card { background: var(--card); border: 2px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; transition: all 0.3s; }
+
+.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media(max-width:600px){.calc-grid{grid-template-columns:1fr}}
+.op-btn { background: var(--card); border: 2px solid var(--border); border-radius: var(--radius2); color: var(--text); font-family: var(--font-code); font-size: 1.1rem; padding: 10px; cursor: pointer; transition: all 0.2s; }
+.op-btn.active { border-color: var(--accent4); color: var(--accent4); background: rgba(245, 158, 11, 0.1); }
+.calc-result { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center;}
+
+.toggle { position: relative; width: 48px; height: 26px; cursor: pointer; display: inline-block;}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track { position: absolute; inset: 0; background: var(--border); border-radius: 13px; transition: all 0.3s; }
+.toggle input:checked ~ .toggle-track { background: var(--accent); }
+.toggle-thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: all 0.3s; }
+.toggle input:checked ~ .toggle-track .toggle-thumb { transform: translateX(22px); }
+
+/* PRACTICAL PROJECTS (S11) */
+.project-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media(max-width:800px){.project-split{grid-template-columns:1fr}}
+.py-console { background: #0d1117; border-radius: var(--radius2); padding: 1rem; font-family: var(--font-code); color: #fff;}
+.py-input-line { display: flex; align-items: center; gap: 8px; margin: 10px 0;}
+.py-input-line input { background: transparent; border: none; border-bottom: 1px solid #555; color: #4fffb0; outline: none; padding: 2px; width: 80px; font-family: var(--font-code);}
+
+/* PYTHON IDE (S12) */
+.ide-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+@media(max-width: 800px) { .ide-container { grid-template-columns: 1fr; } }
+.ide-editor-col, .ide-output-col { display: flex; flex-direction: column; }
+.ide-header {
+  background: var(--card2); padding: 10px 15px; font-family: var(--font-code);
+  font-size: 0.8rem; color: var(--text2); border-bottom: 1px solid var(--border);
+}
+#ide-code {
+  flex: 1; background: #0d1117; color: #e8eaf6; border: none;
+  padding: 15px; font-family: var(--font-code); font-size: 0.9rem;
+  resize: vertical; min-height: 250px; outline: none;
+}
+#ide-output {
+  flex: 1; background: #000; color: #4fffb0; margin: 0; padding: 15px;
+  font-family: var(--font-code); font-size: 0.85rem; overflow-y: auto;
+  min-height: 250px; white-space: pre-wrap;
+}
+
+/* SKULPT CUSTOM MODAL */
+.skulpt-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+  z-index: 2000; display: flex; align-items: center; justify-content: center;
+}
+.skulpt-modal-content {
+  width: 90%; max-width: 400px; padding: 2rem; background: var(--card);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+/* UTILS */
+.mb-2 { margin-bottom: 1rem; } .mb-3 { margin-bottom: 1.5rem; } .mt-2 { margin-top: 1rem; } .mt-3 { margin-top: 1.5rem; }
+.text-muted { color: var(--text2); } .text-accent { color: var(--accent); } .mono { font-family: var(--font-code); }
+.w-full { width: 100%; } .text-center { text-align: center; }
+
+/* DID YOU KNOW & NOTICES */
+.note-callout { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius2); padding: 1rem; display: flex; gap: 0.75rem; margin: 1rem 0; }
+#dyk-toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--card2); border: 1px solid var(--accent5); border-radius: var(--radius); padding: 1rem; max-width: 280px; z-index: 800; transform: translateX(150%); transition: transform 0.4s; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+#dyk-toast.show { transform: translateX(0); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- Custom Skulpt Input Modal -->
+<div id="skulpt-input-modal" class="skulpt-modal" style="display:none;">
+  <div class="skulpt-modal-content">
+      <div id="skulpt-prompt" class="text-accent mb-2 mono">Prompt message</div>
+      <input type="text" id="skulpt-input-val" class="mb-2" autocomplete="off" style="border-color: var(--accent); background: var(--bg); color: var(--text);">
+      <button class="btn btn-accent w-full" id="skulpt-submit">Submit (Enter)</button>
+  </div>
+</div>
+
+<div id="dyk-toast">
+  <button style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text3);cursor:pointer;" onclick="document.getElementById('dyk-toast').classList.remove('show')">×</button>
+  <div style="font-family:var(--font-code);font-size:0.7rem;color:var(--accent5);margin-bottom:0.4rem;">💡 DID YOU KNOW?</div>
+  <div id="dyk-text" style="font-size:0.85rem;color:var(--text2);"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo"><span>py</span>fundamentals<span>.s1</span></div>
+    <ul class="nav-links hidden-mobile">
+      <li><a href="#s1">Think</a></li>
+      <li><a href="#s2">Code</a></li>
+      <li><a href="#s6">Flow</a></li>
+      <li><a href="#s7">Vars</a></li>
+      <li><a href="#s-io">I/O</a></li>
+      <li><a href="#s8">Types</a></li>
+      <li><a href="#s9">Math</a></li>
+      <li><a href="#s10">Logic</a></li>
+      <li><a href="#s11">Projects</a></li>
+      <li><a href="#s-ide">IDE</a></li>
+      <li><a href="#s13">Tasks</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Mode">🌓</button>
+      <div id="points-badge">⭐ <span id="pts">0</span> pts</div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="floating-code fc1">x = "Hello World"<br>print(x)</div>
+  <div class="floating-code fc2">is_adult = age >= 18<br>print(is_adult)</div>
+  <div class="floating-code fc3">def greet(name):<br>&nbsp;&nbsp;return f"Hi {name}"</div>
+  <div class="floating-code fc4">nums = [1, 2, 3]<br>sum(nums)</div>
+  <div class="hero-content">
+    <div class="hero-tag">SECTION 1 · PROGRAMMING FUNDAMENTALS</div>
+    <h1 class="hero-title"><span class="line1">Learn to Think Like</span><span class="line2">a Programmer</span></h1>
+    <p class="hero-sub">An interactive journey from zero to Python fluency. No boring lectures — just hands-on exploration, detailed theory, and visual simulations.</p>
+    
+    <!-- Instructor Badge -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 2.5rem; background: var(--card2); padding: 8px 24px 8px 8px; border-radius: 50px; border: 1px solid var(--border); width: fit-content; margin-left: auto; margin-right: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: inset 0 -2px 5px rgba(0,0,0,0.2);">👨‍🏫</div>
+      <div style="text-align: left; line-height: 1.3;">
+        <div style="color: var(--text); font-weight: 800; font-family: var(--font-head); font-size: 0.95rem;">Eng. Ahmed El-khatib</div>
+        <div style="color: var(--text2); font-size: 0.75rem; font-family: var(--font-body);">Teaching Assistant, FCI Luxor University</div>
+      </div>
+    </div>
+
+    <a href="#s1" class="btn-start">Start Learning ↓</a>
+  </div>
+</section>
+
+<!-- S1: HOW COMPUTERS THINK -->
+<section id="s1"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 01</span>
+    <h2 class="section-title">How Computers Think</h2>
+  </div>
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: The I-P-O Model</div>
+    <div class="expl-body">
+      <p>Computers are incredibly fast, but they aren't "smart" out of the box. They follow a strict, 3-step lifecycle for absolutely everything they do. This is known as the <strong>IPO Model</strong>:</p>
+      <ul>
+        <li><strong>📥 Input:</strong> This is how the computer receives raw data from the outside world. Examples include typing on a keyboard, clicking a mouse, a microphone picking up your voice, or swiping a credit card.</li>
+        <li><strong>⚙️ Process:</strong> The "Brain" of the computer (the CPU) takes that raw data and does something with it based on specific rules. It calculates numbers, checks if passwords match, or applies filters to an image.</li>
+        <li><strong>🖥️ Output:</strong> Showing the final, processed result back to the user. This could be displaying text on a screen, playing a sound through speakers, or printing a receipt.</li>
+      </ul>
+      <p><strong>Real-World Analogy (The ATM Machine):</strong><br>
+      • <em>Input:</em> You insert your card and type your PIN.<br>
+      • <em>Process:</em> The bank's computer verifies your PIN and checks if you have enough balance.<br>
+      • <em>Output:</em> The machine dispenses your cash and prints a receipt.</p>
+    </div>
+  </div>
+
+  <div class="demo-box mt-3">
+    <div class="demo-header"><div class="demo-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="demo-title">🎮 Interactive: The IPO Simulator</span></div>
+    <div class="demo-body">
+      <div class="ipo-demo">
+        <div>
+          <label class="text-sm text-muted block mb-1">Enter an Input (e.g., your name):</label>
+          <input type="text" id="ipo-input-field" placeholder="Type here..." oninput="ipoRun()">
+          <div class="mt-2">
+            <label class="text-sm text-muted block mb-1">Output Screen:</label>
+            <div id="ipo-output-area"><span class="text-muted text-sm">Waiting for input...</span></div>
+          </div>
+        </div>
+        <div class="ipo-steps">
+          <div class="ipo-step" id="step0"><span class="step-dot"></span> <span>Idle... waiting</span></div>
+          <div class="ipo-step" id="step1"><span class="step-dot"></span> <span>📥 Input received</span></div>
+          <div class="ipo-step" id="step2"><span class="step-dot"></span> <span>⚙️ CPU processing data</span></div>
+          <div class="ipo-step" id="step3"><span class="step-dot"></span> <span>💾 Saving to memory</span></div>
+          <div class="ipo-step" id="step4"><span class="step-dot"></span> <span>🖥️ Generating UI</span></div>
+          <div class="ipo-step" id="step5"><span class="step-dot"></span> <span>✅ Output ready!</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- S2: WHAT IS PROGRAMMING -->
+<section id="s2" class="section-alt"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 02</span>
+    <h2 class="section-title">What is Programming?</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: Writing Algorithms</div>
+    <div class="expl-body">
+      <p>If computers only do Input, Process, Output — how do they do complex things like run Video Games or AI models?</p>
+      <p><strong>Programming</strong> is the art of breaking down a massive, complicated problem into a sequence of tiny, extremely precise logical steps. We call this sequence an <strong>Algorithm</strong>.</p>
+      <p>A computer has absolutely zero common sense. It takes your words literally. If you miss one step, the program crashes. A good algorithm must have three properties:</p>
+      <ul>
+        <li><strong>Finiteness:</strong> It must eventually stop and not run forever in an infinite loop.</li>
+        <li><strong>Definiteness:</strong> Every single step must be clear and unambiguous. The computer shouldn't have to "guess" what you mean.</li>
+        <li><strong>Effectiveness:</strong> It should solve the problem correctly and efficiently in a reasonable amount of time.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- S3 & S4 merged logically into explanation to make reading seamless -->
+  <div class="expl-box mt-3" style="border-left-color: var(--accent2)">
+    <div class="expl-header" style="color: var(--accent2)">📖 Theory Check: Compilers vs. Interpreters</div>
+    <div class="expl-body">
+      <p>The CPU only speaks <strong>Machine Code</strong> (a language of 1s and 0s). Because humans cannot write in 1s and 0s easily, we use <strong>High-Level Languages</strong> like Python, C++, or Java that look like English.</p>
+      <p>To bridge the gap, we use a translator program. There are two main types:</p>
+      <ul>
+        <li><strong>🏭 Compilers (e.g., C++, Java):</strong> They read your entire code file at once, check it for errors, and translate the whole thing into a final `.exe` file. It's like translating a whole book before publishing it. <em>(Very fast execution, but takes time to compile).</em></li>
+        <li><strong>🎭 Interpreters (e.g., Python, JavaScript):</strong> They read and translate your code <strong>line-by-line</strong>, executing each line immediately. It's like a live translator at a conference. <em>(Slower execution, but amazing for catching errors instantly—making it perfect for beginners).</em></li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- S6: FLOWCHARTS -->
+<section id="s6"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 03</span>
+    <h2 class="section-title">Visual Logic (Flowcharts)</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: Blueprinting Code</div>
+    <div class="expl-body">
+      <p>Before a civil engineer builds a house, they draw a blueprint. Before a programmer writes code, they draw a <strong>Flowchart</strong>. A flowchart is a visual map of how data moves through your algorithm.</p>
+      <p>We use universal geometric shapes so any programmer in the world can understand it:</p>
+      <ul>
+        <li><strong>🔴 Ovals (Terminal):</strong> Used only at the very Start and End of the program.</li>
+        <li><strong>🟦 Parallelograms (I/O):</strong> Used whenever you receive an Input from the user, or Print an Output to the screen.</li>
+        <li><strong>🟩 Rectangles (Process):</strong> Used for internal actions like doing math (e.g., `Area = L * W`) or saving data into variables.</li>
+        <li><strong>🔶 Diamonds (Decision):</strong> Used when asking a Yes/No question (e.g., "Is Age > 18?"). The path splits based on the answer.</li>
+      </ul>
+      <p>Visualizing logic first helps you catch errors in your thinking before you get confused by writing code syntax!</p>
+    </div>
+  </div>
+
+  <div class="flowchart-tabs">
+    <button class="ftab active" onclick="switchFTab(this,'fc-avg')">📊 Average Math</button>
+    <button class="ftab" onclick="switchFTab(this,'fc-speed')">🚗 Speed Calculator</button>
+  </div>
+
+  <!-- AVERAGE FLOWCHART -->
+  <div id="fc-avg" class="flowchart-panel active">
+    <div class="fc-visual">
+      <svg class="flowchart" viewBox="0 0 260 400" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+        
+        <g class="fc-shape" id="avg-s0">
+          <ellipse cx="130" cy="30" rx="50" ry="20" class="fc-bg"/>
+          <text x="130" y="34" text-anchor="middle" class="fc-text" font-size="12">START</text>
+        </g>
+        <line x1="130" y1="50" x2="130" y2="75" class="fc-line" marker-end="url(#arr)"/>
+        
+        <g class="fc-shape" id="avg-s1">
+          <polygon points="70,80 190,80 210,105 50,105" class="fc-bg"/>
+          <text x="130" y="96" text-anchor="middle" class="fc-text" font-size="10">INPUT: A, B</text>
+        </g>
+        <line x1="130" y1="105" x2="130" y2="135" class="fc-line" marker-end="url(#arr)"/>
+        
+        <g class="fc-shape" id="avg-s2">
+          <rect x="50" y="135" width="160" height="40" rx="4" class="fc-bg"/>
+          <text x="130" y="150" text-anchor="middle" class="fc-text" font-size="9">Sum = A + B</text>
+          <text x="130" y="165" text-anchor="middle" class="fc-text" font-size="9">Avg = Sum / 2</text>
+        </g>
+        <line x1="130" y1="175" x2="130" y2="195" class="fc-line" marker-end="url(#arr)"/>
+
+        <g class="fc-shape" id="avg-s3">
+          <polygon points="70,200 190,200 210,225 50,225" class="fc-bg"/>
+          <text x="130" y="216" text-anchor="middle" class="fc-text" font-size="10">PRINT Avg</text>
+        </g>
+        <line x1="130" y1="225" x2="130" y2="255" class="fc-line" marker-end="url(#arr)"/>
+
+        <g class="fc-shape" id="avg-s4">
+          <ellipse cx="130" cy="280" rx="50" ry="20" class="fc-bg"/>
+          <text x="130" y="284" text-anchor="middle" class="fc-text" font-size="12">END</text>
+        </g>
+      </svg>
+    </div>
+    <div>
+      <div class="fc-pseudo mb-2">
+        <div class="fc-pseudo-header">📝 Pseudocode Execution</div>
+        <div style="padding:1rem;">
+          <div class="pseudo-line" id="avg-p0">START</div>
+          <div class="pseudo-line" id="avg-p1">  INPUT A, B</div>
+          <div class="pseudo-line" id="avg-p2">  Sum = A + B<br>  Avg = Sum / 2</div>
+          <div class="pseudo-line" id="avg-p3">  PRINT Avg</div>
+          <div class="pseudo-line" id="avg-p4">END</div>
+        </div>
+      </div>
+      <button class="btn btn-accent w-full" onclick="fcStep('avg',5)">▶ Step Forward</button>
+      <div class="code-block mt-2">
+        <span class="var">A</span> = <span class="num">10</span><br>
+        <span class="var">B</span> = <span class="num">5</span><br>
+        <span class="var">sum</span> = <span class="var">A</span> + <span class="var">B</span><br>
+        <span class="var">avg</span> = <span class="var">sum</span> / <span class="num">2</span><br>
+        <span class="fn">print</span>(<span class="str">"Average:"</span>, <span class="var">avg</span>)
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEED CALCULATOR FLOWCHART -->
+  <div id="fc-speed" class="flowchart-panel">
+    <div class="fc-visual">
+       <svg class="flowchart" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+        <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+        <line x1="100" y1="32" x2="100" y2="50" class="fc-line" marker-end="url(#arr2)"/>
+        
+        <polygon points="60,55 140,55 150,70 50,70" class="fc-bg"/><text x="100" y="66" text-anchor="middle" class="fc-text" font-size="8">INPUT D, T</text>
+        <line x1="100" y1="70" x2="100" y2="90" class="fc-line" marker-end="url(#arr2)"/>
+        
+        <rect x="30" y="95" width="140" height="25" class="fc-bg"/><text x="100" y="110" text-anchor="middle" class="fc-text" font-size="8">Speed = D / T</text>
+        <line x1="100" y1="120" x2="100" y2="140" class="fc-line" marker-end="url(#arr2)"/>
+
+        <polygon points="60,145 140,145 150,160 50,160" class="fc-bg"/><text x="100" y="156" text-anchor="middle" class="fc-text" font-size="8">PRINT Speed</text>
+        <line x1="100" y1="160" x2="100" y2="180" class="fc-line" marker-end="url(#arr2)"/>
+
+        <ellipse cx="100" cy="195" rx="40" ry="12" class="fc-bg"/><text x="100" y="198" text-anchor="middle" class="fc-text" font-size="8">END</text>
+      </svg>
+    </div>
+    <div>
+      <div class="fc-pseudo mb-2">
+        <div class="fc-pseudo-header">📝 Pseudocode Execution</div>
+        <div style="padding:1rem;">
+          <div class="pseudo-line" id="speed-p0">START</div>
+          <div class="pseudo-line" id="speed-p1">  INPUT Distance, Time</div>
+          <div class="pseudo-line" id="speed-p2">  Speed = Distance / Time</div>
+          <div class="pseudo-line" id="speed-p3">  PRINT Speed</div>
+          <div class="pseudo-line" id="speed-p4">END</div>
+        </div>
+      </div>
+      <button class="btn btn-accent w-full" onclick="fcStep('speed',5)">▶ Step Forward</button>
+      <div class="code-block mt-2">
+        <span class="var">dist</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Distance: "</span>))<br>
+        <span class="var">time</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Time: "</span>))<br>
+        <span class="var">speed</span> = <span class="var">dist</span> / <span class="var">time</span><br>
+        <span class="fn">print</span>(<span class="str">"Average Speed:"</span>, <span class="var">speed</span>)
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- S7: VARIABLES -->
+<section id="s7" class="section-alt"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 04</span>
+    <h2 class="section-title">Variables in Memory</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: Naming Data</div>
+    <div class="expl-body">
+      <p>A <strong>Variable</strong> is simply a named container in the computer's memory (RAM). Think of the RAM as a massive hotel. Without variables, the computer forgets data the moment it finishes processing it. We need to reserve "rooms" in this hotel for our data.</p>
+      <p>When you write code like <code>score = 100</code>, Python does three things:</p>
+      <ol>
+        <li>Finds an empty box/room in the computer's memory.</li>
+        <li>Writes the label "score" on the outside of the box.</li>
+        <li>Puts the value "100" inside the box.</li>
+      </ol>
+      <p>You can change the value inside the box anytime while the program runs (hence the name "variable"). For example, writing <code>score = 150</code> throws away the old 100 and stores 150 instead.</p>
+    </div>
+  </div>
+
+  <div class="mem-sim">
+    <div class="mem-controls">
+      <div class="mem-input-row">
+        <input type="text" id="mem-name" placeholder="name (e.g. hp)" style="max-width:110px">
+        <span class="mem-eq">=</span>
+        <input type="text" id="mem-val" placeholder="value (e.g. 100)">
+      </div>
+      <button class="btn btn-accent w-full mb-2" onclick="mem_assign()">📦 Assign to RAM</button>
+      <div class="mem-log" id="mem-log"><div class="log-line text-muted">Python console ready...</div></div>
+    </div>
+    <div class="mem-area">
+      <div class="text-sm text-muted mb-2 mono border-b pb-2">🧠 RAM Simulation</div>
+      <div class="mem-slots" id="mem-slots"><div class="text-muted text-sm text-center w-full mt-4">Memory is empty.</div></div>
+    </div>
+  </div>
+
+  <div class="expl-box mt-3" style="border-left-color: var(--accent4)">
+    <div class="expl-header" style="color: var(--accent4)">📖 Theory Check: Variable Naming Rules</div>
+    <div class="expl-body">
+      <p>You can't name your variables just anything! Python has strict rules you must follow, or the program will crash:</p>
+      <ul>
+        <li><strong>Rule 1:</strong> It <strong>must start</strong> with a letter or an underscore (<code>_</code>). It <strong>cannot</strong> start with a number (<code>1st_player</code> is banned!).</li>
+        <li><strong>Rule 2:</strong> It can <strong>only contain</strong> letters, numbers, and underscores (<code>a-z, A-Z, 0-9, _</code>). <strong>Spaces and symbols are strictly forbidden!</strong> (Use `first_name` instead of `first name`).</li>
+        <li><strong>Rule 3:</strong> Variable names are <strong>Case-Sensitive</strong>. This means <code>age</code>, <code>Age</code>, and <code>AGE</code> are treated as three completely different memory boxes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="demo-box mt-2">
+    <div class="demo-header"><span class="demo-title">🎮 Interactive: Valid or Invalid Name?</span></div>
+    <div class="demo-body text-center">
+      <div class="text-muted mb-2">Is this a valid Python variable name?</div>
+      <div id="name-game-word" class="mono text-accent" style="font-size:2rem; font-weight:bold; margin-bottom:1rem; letter-spacing:2px;">1st_player</div>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="btn btn-accent" onclick="checkNameGame(true)">✅ Valid</button>
+        <button class="btn" style="border-color:var(--accent3); color:var(--accent3)" onclick="checkNameGame(false)">❌ Invalid</button>
+      </div>
+      <div id="name-game-feedback" class="mt-2 text-sm" style="min-height:20px;"></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- S-IO: INPUT & OUTPUT -->
+<section id="s-io"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 05</span>
+    <h2 class="section-title">Talking to the User (I/O)</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: print() and input()</div>
+    <div class="expl-body">
+      <p>How does a program communicate with the outside world? Through <strong>Input and Output (I/O)</strong> built-in functions!</p>
+      <ul>
+        <li><strong class="mono text-accent">print()</strong>: This is the "mouth" of your program. It outputs data to the screen so the user can read it. You can print raw text, variables, or the results of math equations.<br><span class="text-muted">Example: <code>print("Game Over!")</code> or <code>print(score)</code></span></li>
+        <li><strong class="mono text-accent">input()</strong>: This is the "ear" of your program. It pauses execution and waits for the user to type something on their keyboard and press Enter. It captures whatever they typed.<br><span class="text-muted">Example: <code>name = input("Enter your name: ")</code></span></li>
+      </ul>
+      <p class="text-muted" style="margin-top: 10px;"><em>Notice that inside <code>input()</code>, we can write a prompt string to tell the user what they should type.</em></p>
+    </div>
+  </div>
+
+  <div class="demo-box mt-3">
+    <div class="demo-header"><span class="demo-title">🎮 Interactive: The I/O Terminal</span></div>
+    <div class="demo-body" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem;">
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">Write Code</div>
+        <div class="code-block" style="min-height: 150px;">
+          <span class="var">user_name</span> = <span class="fn">input</span>(<span class="str">"What is your name? "</span>)<br>
+          <span class="fn">print</span>(<span class="str">"Hello "</span> + <span class="var">user_name</span>)
+        </div>
+        <button class="btn btn-accent w-full mt-2" onclick="runIODemo()">▶ Run in Terminal</button>
+      </div>
+      <div class="py-console" id="io-terminal" style="min-height: 150px; display:flex; flex-direction:column; justify-content:flex-end;">
+        <div class="text-muted text-xs mb-auto">Terminal Output</div>
+        <div id="io-prompt" style="display:none;" class="py-input-line">
+          <span id="io-prompt-text" style="color:var(--text2)">What is your name? </span>
+          <input type="text" id="io-input-val" style="color:var(--accent); border-bottom-color:var(--accent)" onkeypress="if(event.key === 'Enter') finishIODemo()">
+        </div>
+        <div id="io-final-out" class="mt-2 text-accent font-bold"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-callout mt-3">
+    <span class="note-icon">⚠️</span>
+    <div class="note-text">
+      <strong>Crucial Hint:</strong> The <code class="mono text-accent">input()</code> function <strong>ALWAYS</strong> treats what the user types as a <strong>String (Text)</strong>. Even if the user types the number `5`, Python sees it as the word `"5"`. If you need to perform math on it, you must <strong>cast</strong> (convert) it immediately!
+      <br><br>
+      <span class="text-muted">Example:</span> <code class="mono text-accent2">age = int(input("Enter age: "))</code>
+    </div>
+  </div>
+</div></section>
+
+<!-- S-COM: COMMENTS -->
+<section id="s-com" class="section-alt"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 06</span>
+    <h2 class="section-title">Code Comments</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: Notes for Humans</div>
+    <div class="expl-body">
+      <p>Code isn't just for computers to read; it's for humans too! When writing code, you often need to leave notes for yourself or your team to explain what a specific block of code does. These notes are called <strong>Comments</strong>.</p>
+      <ul>
+        <li>In Python, anything written on a line after a hash symbol <strong class="mono text-accent" style="font-size: 1.2rem">#</strong> is completely ignored by the Python interpreter. The computer pretends it doesn't exist.</li>
+        <li><strong>Commenting Out:</strong> Comments are also incredibly useful for temporarily disabling a line of code while hunting for bugs without actually deleting the code.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="demo-box mt-3">
+    <div class="demo-header"><span class="demo-title">🎮 Interactive: Save the Program!</span></div>
+    <div class="demo-body">
+      <p class="text-muted text-sm mb-2">The code below has a dangerous line that crashes the system. Add a <strong class="text-accent">#</strong> to "comment it out" and save the mission!</p>
+      <div class="code-block" style="padding:1rem;">
+        <span class="fn">print</span>(<span class="str">"Starting engine..."</span>)<br>
+        <div style="display:flex; align-items:center; gap:5px; margin: 5px 0;">
+          <input type="text" id="comment-inp" placeholder="" style="width:35px; padding:2px; text-align:center; color:var(--accent4); background:var(--bg); border:1px solid var(--border); font-size:1rem; font-weight:bold;" maxlength="1">
+          <span class="fn" style="color:var(--accent3)">trigger_self_destruct()</span>
+        </div>
+        <span class="fn">print</span>(<span class="str">"Engine started successfully!"</span>)
+      </div>
+      <button class="btn btn-accent w-full mt-3" onclick="runCommentDemo()">▶ Run Code</button>
+      <div class="py-console mt-2" id="comment-terminal" style="min-height: 80px;">
+        <div class="text-muted text-xs mb-1">Terminal Output</div>
+        <div id="comment-out" class="mt-1 font-bold font-mono text-sm"></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- S8: DATA TYPES -->
+<section id="s8"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 07</span>
+    <h2 class="section-title">Data Types</h2>
+  </div>
+  
+  <div class="expl-box mb-3">
+    <div class="expl-header">📖 Theory Check: Identifying Data</div>
+    <div class="expl-body">
+      <p>Memory boxes (variables) can hold different types of information. Python automatically detects what kind of data you are storing. The four primitive types are:</p>
+      <ul>
+        <li><strong>Integer (int):</strong> Whole numbers without decimals (e.g., <code>10</code>, <code>-5</code>, <code>0</code>). Used for counting or indexing.</li>
+        <li><strong>Float:</strong> Numbers containing a decimal point (e.g., <code>3.14</code>, <code>-0.99</code>). Used for precise measurements, money, or percentages.</li>
+        <li><strong>String (str):</strong> Text data. It <strong>must</strong> be enclosed in quotes (e.g., <code>"Ahmed"</code>, <code>"123"</code>). Anything in quotes is text!</li>
+        <li><strong>Boolean (bool):</strong> A logical value that can only be <code>True</code> or <code>False</code>. Used heavily in decision making (If statements).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="type-detector">
+    <div>
+      <input type="text" id="type-input" placeholder='Type something (e.g. 42, "Ahmed", 3.14)' oninput="detectType()" class="mb-3 p-3">
+      <div class="type-icons">
+        <div class="type-icon-card" id="ti-int"><div>🔢</div><div class="mono font-bold mt-1">int</div><div class="text-xs text-muted">Whole numbers</div></div>
+        <div class="type-icon-card" id="ti-float"><div>🌊</div><div class="mono font-bold mt-1">float</div><div class="text-xs text-muted">Decimals</div></div>
+        <div class="type-icon-card" id="ti-str"><div>📝</div><div class="mono font-bold mt-1">str</div><div class="text-xs text-muted">Text</div></div>
+        <div class="type-icon-card" id="ti-bool"><div>⚡</div><div class="mono font-bold mt-1">bool</div><div class="text-xs text-muted">True/False</div></div>
+      </div>
+    </div>
+    <div id="type-result" class="demo-box" style="margin:0;display:flex;flex-direction:column;justify-content:center;">
+      <span style="font-size:3rem;margin-bottom:10px">🤔</span>
+      <div class="mono font-bold">Waiting...</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- S-CAST: TYPE CASTING -->
+<section id="s-cast" class="section-alt"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 08</span>
+    <h2 class="section-title">Type Casting (Conversion)</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: Changing Data Types</div>
+    <div class="expl-body">
+      <p>Sometimes data is in the wrong format. As mentioned earlier, <code>input()</code> always captures data as <strong>Text (String)</strong>. If a user types <code>5</code>, Python sees it as the text <code>"5"</code>. If you try to do math like <code>"5" + 10</code>, Python will crash with a TypeError!</p>
+      <p>To fix this, we must <strong>Cast</strong> (convert) the data to the correct numerical type using these built-in functions:</p>
+      <ul>
+        <li><strong class="mono text-accent">int()</strong>: Converts a compatible value to an Integer (whole number). Example: <code>int("5") &rarr; 5</code>.</li>
+        <li><strong class="mono text-accent">float()</strong>: Converts to a decimal. Example: <code>float("3") &rarr; 3.0</code>. Essential for money or measurements!</li>
+        <li><strong class="mono text-accent">str()</strong>: Converts any number or boolean back into pure text. Example: <code>str(42) &rarr; "42"</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="demo-box mt-3">
+    <div class="demo-header"><span class="demo-title">🎮 Interactive: The Casting Machine</span></div>
+    <div class="demo-body" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:center;">
+      <input type="text" id="cast-val" placeholder='Enter value (e.g. "10" or 3.14)' style="max-width:200px;">
+      <span class="text-muted" style="font-size:1.5rem">➔</span>
+      <select id="cast-op" style="max-width:150px; background:var(--card2); cursor:pointer;">
+        <option value="int">int()</option>
+        <option value="float">float()</option>
+        <option value="str">str()</option>
+        <option value="bool">bool()</option>
+      </select>
+      <button class="btn btn-accent" onclick="runCast()">⚙️ Cast!</button>
+    </div>
+    <div id="cast-result" class="mt-3 p-3 code-block text-center" style="display:none; max-width: 400px; margin-left:auto; margin-right:auto;">
+      <span class="text-muted text-sm">Output Value:</span>
+      <div id="cast-out" class="mono text-accent font-bold" style="font-size:1.5rem; margin:10px 0;"></div>
+      <div id="cast-type" class="text-xs text-muted" style="background:var(--bg); color:var(--text); padding:5px; border-radius:4px; display:inline-block"></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- S9: ARITHMETIC OPERATORS -->
+<section id="s9"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 09</span>
+    <h2 class="section-title">Arithmetic Operators</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: Doing Math & Special Divisions</div>
+    <div class="expl-body">
+      <p>Python is essentially a very powerful calculator. It uses standard math symbols (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>). Note that normal division (<code>/</code>) ALWAYS returns a float (decimal), even if the numbers divide perfectly.</p>
+      <p>More importantly, Python has special operators that are crucial for programming logic:</p>
+      <ul>
+        <li><strong class="mono text-accent" style="font-size: 1.1rem">//</strong> <strong>(Floor Division):</strong> Performs division but completely <i>throws away</i> the decimal part. It asks 'How many full, unbroken times does B fit into A?'. <br><span class="text-muted">Example: <code>17 // 5 = 3</code> (Because 5 fits fully 3 times to make 15).</span></li>
+        <li><strong class="mono text-accent" style="font-size: 1.1rem">%</strong> <strong>(Modulo):</strong> Returns the <i>remainder</i> of a division. If you divide 17 by 5, you get 3 with a remainder of 2. <br><span class="text-muted">Example: <code>17 % 5 = 2</code>. Modulo is heavily used to check if a number is Even/Odd (<code>num % 2 == 0</code>) or to extract digits.</span></li>
+        <li><strong class="mono text-accent" style="font-size: 1.1rem">**</strong> <strong>(Exponent):</strong> Calculates power. <br><span class="text-muted">Example: <code>2 ** 3 = 8</code> (which means 2 * 2 * 2).</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-inputs">
+      <div class="calc-row">
+        <label>A</label>
+        <input type="number" id="calc-a" value="17" oninput="calcUpdate()">
+      </div>
+      <div class="op-grid">
+        <button class="op-btn" onclick="calcOp(this,'+'  )">+</button>
+        <button class="op-btn" onclick="calcOp(this,'-'  )">−</button>
+        <button class="op-btn" onclick="calcOp(this,'*'  )">×</button>
+        <button class="op-btn" onclick="calcOp(this,'/'  )">÷</button>
+        <button class="op-btn active" onclick="calcOp(this,'//' )">÷÷</button>
+        <button class="op-btn" onclick="calcOp(this,'%'  )">%</button>
+        <button class="op-btn" onclick="calcOp(this,'**' )">^</button>
+      </div>
+      <div class="calc-row">
+        <label>B</label>
+        <input type="number" id="calc-b" value="5" oninput="calcUpdate()">
+      </div>
+    </div>
+    <div class="calc-result">
+      <div class="calc-expr" id="calc-expr">17 // 5</div>
+      <div class="calc-equals" id="calc-result" style="color:var(--accent); font-weight:bold; font-size:2rem;">= 3</div>
+      <div class="calc-explain" id="calc-explain">Floor Division: Divides and drops the decimal part</div>
+      <div class="code-block" id="calc-py" style="font-size:0.8rem;text-align:left">
+        <span class="var">result</span> = <span class="num">17</span> <span style="color:var(--accent4)">//</span> <span class="num">5</span>  <span class="cmt"># = 3</span>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- S-STRING: STRING MAGIC -->
+<section id="s-string" class="section-alt"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 10</span>
+    <h2 class="section-title">String Magic (Text Math)</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: Adding & Multiplying Text</div>
+    <div class="expl-body">
+      <p>Math isn't just for numbers! In Python, you can use the <code>+</code> and <code>*</code> operators on Strings (Text) to do some pretty cool formatting tricks:</p>
+      <ul>
+        <li><strong class="mono text-accent">+ (Concatenation):</strong> Glues two strings together side-by-side into a single new string. <br><span class="text-muted">Example: <code>"Py" + "thon" &rarr; "Python"</code></span></li>
+        <li><strong class="mono text-accent">* (Repetition):</strong> Multiplies a string by an integer to repeat it multiple times consecutively. Great for drawing lines or repeated patterns in the console. <br><span class="text-muted">Example: <code>"Ha" * 3 &rarr; "HaHaHa"</code> or <code>"=" * 10 &rarr; "=========="</code></span></li>
+      </ul>
+      <p class="text-muted" style="font-size: 0.85rem; margin-top: 10px;"><em>Note: You cannot subtract (-) or divide (/) strings. Doing so will crash your program!</em></p>
+    </div>
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-inputs">
+      <div class="py-input-line">
+        <span style="color:var(--text)">Word:</span>
+        <input type="text" id="str-word" value="Code" style="color:var(--text); border-color:var(--border2);" oninput="updateStringMagic()">
+      </div>
+      <div class="op-grid" style="grid-template-columns: 1fr 1fr;">
+        <button class="op-btn active" id="btn-str-add" onclick="setStringOp('+')">Glue (+)</button>
+        <button class="op-btn" id="btn-str-mul" onclick="setStringOp('*')">Repeat (*)</button>
+      </div>
+      <div class="py-input-line" id="str-add-div">
+        <span style="color:var(--text)">Add Word:</span>
+        <input type="text" id="str-word2" value="Ninja" style="color:var(--text); border-color:var(--border2);" oninput="updateStringMagic()">
+      </div>
+      <div class="py-input-line" id="str-mul-div" style="display:none;">
+        <span style="color:var(--text)">Times (Number):</span>
+        <input type="number" id="str-num" value="3" style="color:var(--text); border-color:var(--border2);" oninput="updateStringMagic()">
+      </div>
+    </div>
+    <div class="calc-result" style="justify-content: center;">
+      <div class="calc-expr" id="str-expr">"Code" + "Ninja"</div>
+      <div class="calc-equals" id="str-result" style="color:var(--accent); font-size:1.5rem; word-break: break-all;">= "CodeNinja"</div>
+      <div class="code-block" id="str-py" style="font-size:0.8rem;text-align:left; margin-top:10px;">
+        <span class="var">res</span> = <span class="str">"Code"</span> + <span class="str">"Ninja"</span>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- S10: LOGICAL OPERATORS -->
+<section id="s10"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 11</span>
+    <h2 class="section-title">Logical Operators</h2>
+  </div>
+
+  <div class="expl-box">
+    <div class="expl-header">📖 Theory Check: Making Complex Decisions</div>
+    <div class="expl-body">
+      <p>Real-world programs rarely ask just one simple question. Often, they need to check multiple conditions at the same time. To combine questions, we use <strong>Logical Operators</strong>:</p>
+      <ul>
+        <li><strong class="mono text-accent">and</strong> : Strict mode. <em>Every single</em> condition must be True. If even one condition is False, the entire result fails and becomes False.</li>
+        <li><strong class="mono text-accent">or</strong> : Flexible mode. As long as <em>at least one</em> condition is True, the result is True. It only fails if everything is False.</li>
+        <li><strong class="mono text-accent">not</strong> : Flips the truth. <code>not True</code> becomes False, and <code>not False</code> becomes True.</li>
+      </ul>
+      <p>Try the nightclub entry simulation below. Notice how being on the guest list (OR) overrides the other strict (AND) age and ID requirements!</p>
+    </div>
+  </div>
+
+  <div class="logic-sim mb-3">
+    <div class="logic-scenario">
+      <div class="logic-title" style="font-weight: bold; margin-bottom: 10px;">🏛 Venue Entry System</div>
+      <div class="toggle-row" style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <span class="toggle-label">Age > 18 (is adult)</span>
+        <label class="toggle">
+          <input type="checkbox" id="t-age" onchange="updateLogic()">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+      <div class="toggle-row" style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <span class="toggle-label">Has valid ID</span>
+        <label class="toggle">
+          <input type="checkbox" id="t-id" onchange="updateLogic()">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+      <div class="toggle-row" style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <span class="toggle-label">Is on guest list</span>
+        <label class="toggle">
+          <input type="checkbox" id="t-guest" onchange="updateLogic()">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+      <div class="code-block mt-2" style="font-size:0.78rem">
+        <span class="cmt"># Entry rule:</span><br>
+        allowed = (age > <span class="num">18</span> <span class="kw">and</span> has_id) <span class="kw">or</span> on_guest_list
+      </div>
+    </div>
+    <div class="logic-result-box denied" id="logic-result" style="text-align: center; padding: 20px; background: var(--card2); border-radius: var(--radius); margin-top: 15px; border: 1px solid var(--border);">
+      <div class="logic-result-icon" id="logic-icon" style="font-size: 3rem;">🚫</div>
+      <div class="logic-result-text" id="logic-text" style="font-size: 1.2rem; font-weight: bold; color: var(--accent3);">Entry Denied</div>
+      <div class="logic-result-expr" id="logic-expr" style="font-family: var(--font-code); font-size: 0.8rem; margin-top: 10px; color: var(--text2);">(False AND False) OR False = False</div>
+    </div>
+  </div>
+
+</div></section>
+
+<!-- S11: PRACTICAL PROJECTS -->
+<section id="s11" class="section-alt"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 12</span>
+    <h2 class="section-title">Practical Projects</h2>
+    <p class="section-desc">Let's put everything together! Below are complete programs demonstrating the IPO model. You can see the Flowchart, Pseudocode, and the final Python Code acting together.</p>
+  </div>
+
+  <div class="flowchart-tabs" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom: 20px;">
+    <button class="ftab active" onclick="switchProj(this, 'proj-temp')">🌡️ Celsius to Fahrenheit</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-area')">⭕ Area of a Circle</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-bmi')">⚖️ BMI Calculator</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-vote')">🗳️ Voting Check</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-salary')">💵 Salary Calculator</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-discount')">🏷️ Discount</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-length')">📏 Length Converter (//)</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-interest')">📈 Simple Interest</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-bill')">🍽️ Bill Splitter</button>
+    <button class="ftab" onclick="switchProj(this, 'proj-notes')">🏦 ATM Banknotes (//)</button>
+  </div>
+
+  <div class="demo-box p-4" style="padding: 1.5rem;">
+    
+    <!-- TEMP PROJECT -->
+    <div id="proj-temp" class="project-split">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Ask the user for a temperature in Celsius, convert it into Fahrenheit using the standard mathematical formula, and display the result.
+      </div>
+      <!-- Left: Logic -->
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr3" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="50" class="fc-line" marker-end="url(#arr3)"/>
+             
+             <polygon points="60,55 140,55 150,70 50,70" class="fc-bg"/><text x="100" y="66" text-anchor="middle" class="fc-text" font-size="8">INPUT C</text>
+             <line x1="100" y1="70" x2="100" y2="90" class="fc-line" marker-end="url(#arr3)"/>
+             
+             <rect x="30" y="95" width="140" height="25" class="fc-bg"/><text x="100" y="110" text-anchor="middle" class="fc-text" font-size="8">F = (C * 9/5) + 32</text>
+             <line x1="100" y1="120" x2="100" y2="140" class="fc-line" marker-end="url(#arr3)"/>
+
+             <polygon points="60,145 140,145 150,160 50,160" class="fc-bg"/><text x="100" y="156" text-anchor="middle" class="fc-text" font-size="8">PRINT F</text>
+             <line x1="100" y1="160" x2="100" y2="180" class="fc-line" marker-end="url(#arr3)"/>
+
+             <ellipse cx="100" cy="195" rx="40" ry="12" class="fc-bg"/><text x="100" y="198" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT C</div>
+          <div style="color:#d97706;">  F = (C * 9/5) + 32</div>
+          <div style="color:#0ea5e9;">  PRINT F</div>
+          <div>END</div>
+        </div>
+      </div>
+      <!-- Right: Code -->
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">c</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Enter Celsius: "</span>))<br>
+          <span class="var">f</span> = (<span class="var">c</span> * <span class="num">9</span>/<span class="num">5</span>) + <span class="num">32</span><br>
+          <span class="fn">print</span>(<span class="str">"Fahrenheit:"</span>, <span class="var">f</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Enter Celsius:</span>
+            <input type="number" id="inp-c" placeholder="e.g. 25">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runTemp()">▶ Run Program</button>
+          <div id="out-temp" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AREA PROJECT -->
+    <div id="proj-area" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Calculate the Area of a Circle. Receive the radius as input from the user, and use the constant Pi (3.14159) to find the area using the formula (Pi * R * R).
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr4" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="50" class="fc-line" marker-end="url(#arr4)"/>
+             <polygon points="60,55 140,55 150,70 50,70" class="fc-bg"/><text x="100" y="66" text-anchor="middle" class="fc-text" font-size="8">INPUT R</text>
+             <line x1="100" y1="70" x2="100" y2="90" class="fc-line" marker-end="url(#arr4)"/>
+             <rect x="30" y="95" width="140" height="25" class="fc-bg"/><text x="100" y="110" text-anchor="middle" class="fc-text" font-size="8">Area = 3.14 * R * R</text>
+             <line x1="100" y1="120" x2="100" y2="140" class="fc-line" marker-end="url(#arr4)"/>
+             <polygon points="60,145 140,145 150,160 50,160" class="fc-bg"/><text x="100" y="156" text-anchor="middle" class="fc-text" font-size="8">PRINT Area</text>
+             <line x1="100" y1="160" x2="100" y2="180" class="fc-line" marker-end="url(#arr4)"/>
+             <ellipse cx="100" cy="195" rx="40" ry="12" class="fc-bg"/><text x="100" y="198" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT R</div>
+          <div style="color:#d97706;">  Area = 3.14 * R * R</div>
+          <div style="color:#0ea5e9;">  PRINT Area</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">r</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Enter Radius: "</span>))<br>
+          <span class="var">pi</span> = <span class="num">3.14159</span><br>
+          <span class="var">area</span> = <span class="var">pi</span> * (<span class="var">r</span> ** <span class="num">2</span>)<br>
+          <span class="fn">print</span>(<span class="str">"Area:"</span>, <span class="var">area</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Enter Radius:</span>
+            <input type="number" id="inp-area" placeholder="e.g. 5">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runArea()">▶ Run Program</button>
+          <div id="out-area" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BMI PROJECT -->
+    <div id="proj-bmi" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Build a Body Mass Index (BMI) calculator. It should take the user's weight in Kilograms and height in Meters, then apply the formula: <code>BMI = weight / (height * height)</code>.
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr5" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="50" class="fc-line" marker-end="url(#arr5)"/>
+             <polygon points="60,55 140,55 150,70 50,70" class="fc-bg"/><text x="100" y="66" text-anchor="middle" class="fc-text" font-size="8">INPUT W, H</text>
+             <line x1="100" y1="70" x2="100" y2="90" class="fc-line" marker-end="url(#arr5)"/>
+             <rect x="30" y="95" width="140" height="25" class="fc-bg"/><text x="100" y="110" text-anchor="middle" class="fc-text" font-size="8">BMI = W / (H * H)</text>
+             <line x1="100" y1="120" x2="100" y2="140" class="fc-line" marker-end="url(#arr5)"/>
+             <polygon points="60,145 140,145 150,160 50,160" class="fc-bg"/><text x="100" y="156" text-anchor="middle" class="fc-text" font-size="8">PRINT BMI</text>
+             <line x1="100" y1="160" x2="100" y2="180" class="fc-line" marker-end="url(#arr5)"/>
+             <ellipse cx="100" cy="195" rx="40" ry="12" class="fc-bg"/><text x="100" y="198" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT weight, height</div>
+          <div style="color:#d97706;">  bmi = weight / (height * height)</div>
+          <div style="color:#0ea5e9;">  PRINT bmi</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">w</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Weight (kg): "</span>))<br>
+          <span class="var">h</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Height (m): "</span>))<br>
+          <span class="var">bmi</span> = <span class="var">w</span> / (<span class="var">h</span> * <span class="var">h</span>)<br>
+          <span class="fn">print</span>(<span class="str">"BMI:"</span>, <span class="var">bmi</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Weight (kg):</span>
+            <input type="number" id="inp-w" placeholder="e.g. 70" style="width: 70px">
+          </div>
+          <div class="py-input-line">
+            <span>Height (m):</span>
+            <input type="number" id="inp-h" placeholder="e.g. 1.75" style="width: 70px" step="0.01">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runBMI()">▶ Run Program</button>
+          <div id="out-bmi" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOTE PROJECT -->
+    <div id="proj-vote" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Check eligibility using a Boolean operation. Ask for the user's age and determine if they are 18 or older. It will output either <code>True</code> or <code>False</code>.
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr6" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="50" class="fc-line" marker-end="url(#arr6)"/>
+             <polygon points="60,55 140,55 150,70 50,70" class="fc-bg"/><text x="100" y="66" text-anchor="middle" class="fc-text" font-size="8">INPUT Age</text>
+             <line x1="100" y1="70" x2="100" y2="90" class="fc-line" marker-end="url(#arr6)"/>
+             <rect x="25" y="95" width="150" height="25" class="fc-bg"/><text x="100" y="110" text-anchor="middle" class="fc-text" font-size="7.5">Eligible = Age >= 18</text>
+             <line x1="100" y1="120" x2="100" y2="140" class="fc-line" marker-end="url(#arr6)"/>
+             <polygon points="50,145 150,145 160,160 40,160" class="fc-bg"/><text x="100" y="156" text-anchor="middle" class="fc-text" font-size="8">PRINT Eligible</text>
+             <line x1="100" y1="160" x2="100" y2="180" class="fc-line" marker-end="url(#arr6)"/>
+             <ellipse cx="100" cy="195" rx="40" ry="12" class="fc-bg"/><text x="100" y="198" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT age</div>
+          <div style="color:#d97706;">  is_eligible = age >= 18</div>
+          <div style="color:#0ea5e9;">  PRINT is_eligible</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">age</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Enter Age: "</span>))<br>
+          <span class="var">is_eligible</span> = <span class="var">age</span> >= <span class="num">18</span><br>
+          <span class="fn">print</span>(<span class="str">"Can vote:"</span>, <span class="var">is_eligible</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Enter Age:</span>
+            <input type="number" id="inp-age" placeholder="e.g. 20" style="width: 70px">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runVote()">▶ Run Program</button>
+          <div id="out-vote" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SALARY PROJECT -->
+    <div id="proj-salary" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Compute the total salary of an employee. Ask for the number of hours worked and the hourly rate, then multiply them together to print the total earnings.
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr7" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="50" class="fc-line" marker-end="url(#arr7)"/>
+             <polygon points="50,55 150,55 160,70 40,70" class="fc-bg"/><text x="100" y="66" text-anchor="middle" class="fc-text" font-size="8">INPUT Hrs, Rate</text>
+             <line x1="100" y1="70" x2="100" y2="90" class="fc-line" marker-end="url(#arr7)"/>
+             <rect x="30" y="95" width="140" height="25" class="fc-bg"/><text x="100" y="110" text-anchor="middle" class="fc-text" font-size="8">Salary = Hrs * Rate</text>
+             <line x1="100" y1="120" x2="100" y2="140" class="fc-line" marker-end="url(#arr7)"/>
+             <polygon points="60,145 140,145 150,160 50,160" class="fc-bg"/><text x="100" y="156" text-anchor="middle" class="fc-text" font-size="8">PRINT Salary</text>
+             <line x1="100" y1="160" x2="100" y2="180" class="fc-line" marker-end="url(#arr7)"/>
+             <ellipse cx="100" cy="195" rx="40" ry="12" class="fc-bg"/><text x="100" y="198" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT hours, rate</div>
+          <div style="color:#d97706;">  salary = hours * rate</div>
+          <div style="color:#0ea5e9;">  PRINT salary</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">h</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Hours: "</span>))<br>
+          <span class="var">r</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Rate: "</span>))<br>
+          <span class="var">salary</span> = <span class="var">h</span> * <span class="var">r</span><br>
+          <span class="fn">print</span>(<span class="str">"Salary:"</span>, <span class="var">salary</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Hours Worked:</span>
+            <input type="number" id="inp-hrs" placeholder="e.g. 40" style="width: 70px">
+          </div>
+          <div class="py-input-line">
+            <span>Hourly Rate:</span>
+            <input type="number" id="inp-rate" placeholder="e.g. 15" style="width: 70px">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runSalary()">▶ Run Program</button>
+          <div id="out-salary" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISCOUNT PROJECT -->
+    <div id="proj-discount" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Find out the final price of a product during a sale. Ask for the original price and the discount percentage. Calculate how much money is saved, subtract it, and print the new price.
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr8" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="45" class="fc-line" marker-end="url(#arr8)"/>
+             <polygon points="50,50 150,50 160,65 40,65" class="fc-bg"/><text x="100" y="61" text-anchor="middle" class="fc-text" font-size="8">INPUT Price, Disc</text>
+             <line x1="100" y1="65" x2="100" y2="80" class="fc-line" marker-end="url(#arr8)"/>
+             <rect x="20" y="85" width="160" height="25" class="fc-bg"/><text x="100" y="100" text-anchor="middle" class="fc-text" font-size="8">Save = Price * (Disc/100)</text>
+             <line x1="100" y1="110" x2="100" y2="125" class="fc-line" marker-end="url(#arr8)"/>
+             <rect x="30" y="130" width="140" height="25" class="fc-bg"/><text x="100" y="145" text-anchor="middle" class="fc-text" font-size="8">Final = Price - Save</text>
+             <line x1="100" y1="155" x2="100" y2="170" class="fc-line" marker-end="url(#arr8)"/>
+             <polygon points="50,175 150,175 160,190 40,190" class="fc-bg"/><text x="100" y="186" text-anchor="middle" class="fc-text" font-size="8">PRINT Final</text>
+             <line x1="100" y1="190" x2="100" y2="210" class="fc-line" marker-end="url(#arr8)"/>
+             <ellipse cx="100" cy="225" rx="40" ry="12" class="fc-bg"/><text x="100" y="228" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT price, discount</div>
+          <div style="color:#d97706;">  saving = price * (discount / 100)</div>
+          <div style="color:#d97706;">  final = price - saving</div>
+          <div style="color:#0ea5e9;">  PRINT final</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">price</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Price: "</span>))<br>
+          <span class="var">discount</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Discount %: "</span>))<br>
+          <span class="var">saving</span> = <span class="var">price</span> * (<span class="var">discount</span> / <span class="num">100</span>)<br>
+          <span class="var">final</span> = <span class="var">price</span> - <span class="var">saving</span><br>
+          <span class="fn">print</span>(<span class="str">"Final Price:"</span>, <span class="var">final</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Original Price:</span>
+            <input type="number" id="inp-price" placeholder="e.g. 500" style="width: 70px">
+          </div>
+          <div class="py-input-line">
+            <span>Discount %:</span>
+            <input type="number" id="inp-disc" placeholder="e.g. 20" style="width: 70px">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runDiscount()">▶ Run Program</button>
+          <div id="out-disc" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LENGTH CONVERTER PROJECT -->
+    <div id="proj-length" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Practice using Floor Division <code>//</code> and Modulo <code>%</code>. Ask the user for a total length in Centimeters. Convert it to full Meters and the remaining Centimeters (e.g., 254cm becomes 2 meters and 54 cm).
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic (// and %)</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr9" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="45" class="fc-line" marker-end="url(#arr9)"/>
+             <polygon points="50,50 150,50 160,65 40,65" class="fc-bg"/><text x="100" y="61" text-anchor="middle" class="fc-text" font-size="8">INPUT total_cm</text>
+             <line x1="100" y1="65" x2="100" y2="80" class="fc-line" marker-end="url(#arr9)"/>
+             <rect x="20" y="85" width="160" height="25" class="fc-bg"/><text x="100" y="100" text-anchor="middle" class="fc-text" font-size="8">meters = total_cm // 100</text>
+             <line x1="100" y1="110" x2="100" y2="125" class="fc-line" marker-end="url(#arr9)"/>
+             <rect x="20" y="130" width="160" height="25" class="fc-bg"/><text x="100" y="145" text-anchor="middle" class="fc-text" font-size="8">rem_cm = total_cm % 100</text>
+             <line x1="100" y1="155" x2="100" y2="170" class="fc-line" marker-end="url(#arr9)"/>
+             <polygon points="40,175 160,175 170,190 30,190" class="fc-bg"/><text x="100" y="186" text-anchor="middle" class="fc-text" font-size="8">PRINT meters, rem_cm</text>
+             <line x1="100" y1="190" x2="100" y2="210" class="fc-line" marker-end="url(#arr9)"/>
+             <ellipse cx="100" cy="225" rx="40" ry="12" class="fc-bg"/><text x="100" y="228" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT total_cm</div>
+          <div style="color:#d97706;">  meters = total_cm // 100</div>
+          <div style="color:#d97706;">  rem_cm = total_cm % 100</div>
+          <div style="color:#0ea5e9;">  PRINT meters, rem_cm</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">total_cm</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Total Centimeters: "</span>))<br>
+          <span class="var">meters</span> = <span class="var">total_cm</span> // <span class="num">100</span><br>
+          <span class="var">rem_cm</span> = <span class="var">total_cm</span> % <span class="num">100</span><br>
+          <span class="fn">print</span>(<span class="var">meters</span>, <span class="str">"meters and"</span>, <span class="var">rem_cm</span>, <span class="str">"cm"</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Total CM:</span>
+            <input type="number" id="inp-length" placeholder="e.g. 254" style="width: 70px">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runLength()">▶ Run Program</button>
+          <div id="out-length" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- SIMPLE INTEREST PROJECT (Replaces Reverse Digits) -->
+    <div id="proj-interest" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Calculate the Simple Interest on a bank loan or deposit. The user enters the Principal Amount, the Interest Rate (%), and the Time in years. <br>Formula: <code>Interest = (Principal * Rate * Time) / 100</code>. Finally, print the interest and total amount.
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. Math Magic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr11" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="45" class="fc-line" marker-end="url(#arr11)"/>
+             
+             <polygon points="40,50 160,50 170,65 30,65" class="fc-bg"/><text x="100" y="61" text-anchor="middle" class="fc-text" font-size="8">INPUT P, R, T</text>
+             <line x1="100" y1="65" x2="100" y2="80" class="fc-line" marker-end="url(#arr11)"/>
+             
+             <rect x="20" y="85" width="160" height="25" class="fc-bg"/><text x="100" y="100" text-anchor="middle" class="fc-text" font-size="8">Intr = (P * R * T) / 100</text>
+             <line x1="100" y1="110" x2="100" y2="125" class="fc-line" marker-end="url(#arr11)"/>
+             
+             <rect x="20" y="130" width="160" height="25" class="fc-bg"/><text x="100" y="145" text-anchor="middle" class="fc-text" font-size="8">Total = P + Intr</text>
+             <line x1="100" y1="155" x2="100" y2="170" class="fc-line" marker-end="url(#arr11)"/>
+             
+             <polygon points="40,175 160,175 170,190 30,190" class="fc-bg"/><text x="100" y="186" text-anchor="middle" class="fc-text" font-size="8">PRINT Intr, Total</text>
+             <line x1="100" y1="190" x2="100" y2="210" class="fc-line" marker-end="url(#arr11)"/>
+             
+             <ellipse cx="100" cy="225" rx="40" ry="12" class="fc-bg"/><text x="100" y="228" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT P, R, T</div>
+          <div style="color:#d97706;">  Interest = (P * R * T) / 100</div>
+          <div style="color:#d97706;">  Total = P + Interest</div>
+          <div style="color:#0ea5e9;">  PRINT Interest, Total</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">p</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Principal: "</span>))<br>
+          <span class="var">r</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Rate %: "</span>))<br>
+          <span class="var">t</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Time (Years): "</span>))<br>
+          <span class="var">interest</span> = (<span class="var">p</span> * <span class="var">r</span> * <span class="var">t</span>) / <span class="num">100</span><br>
+          <span class="var">total</span> = <span class="var">p</span> + <span class="var">interest</span><br>
+          <span class="fn">print</span>(<span class="str">"Interest:"</span>, <span class="var">interest</span>)<br>
+          <span class="fn">print</span>(<span class="str">"Total Amount:"</span>, <span class="var">total</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Principal ($):</span>
+            <input type="number" id="inp-p" placeholder="e.g. 1000" style="width: 70px">
+          </div>
+          <div class="py-input-line">
+            <span>Rate (%):</span>
+            <input type="number" id="inp-r" placeholder="e.g. 5" style="width: 70px">
+          </div>
+          <div class="py-input-line">
+            <span>Years:</span>
+            <input type="number" id="inp-t" placeholder="e.g. 2" style="width: 70px">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runInterest()">▶ Run Program</button>
+          <div id="out-interest" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILL SPLITTER PROJECT -->
+    <div id="proj-bill" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Calculate how much each friend needs to pay when sharing a restaurant bill. Ask for the bill amount, the tip percentage, and the number of people. Then divide the total cost equally.
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr10" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="45" class="fc-line" marker-end="url(#arr10)"/>
+             <polygon points="40,50 160,50 170,65 30,65" class="fc-bg"/><text x="100" y="61" text-anchor="middle" class="fc-text" font-size="8">INPUT bill, tip, ppl</text>
+             <line x1="100" y1="65" x2="100" y2="80" class="fc-line" marker-end="url(#arr10)"/>
+             <rect x="20" y="85" width="160" height="25" class="fc-bg"/><text x="100" y="100" text-anchor="middle" class="fc-text" font-size="8">total = bill + (bill*tip/100)</text>
+             <line x1="100" y1="110" x2="100" y2="125" class="fc-line" marker-end="url(#arr10)"/>
+             <rect x="20" y="130" width="160" height="25" class="fc-bg"/><text x="100" y="145" text-anchor="middle" class="fc-text" font-size="8">split = total / ppl</text>
+             <line x1="100" y1="155" x2="100" y2="170" class="fc-line" marker-end="url(#arr10)"/>
+             <polygon points="40,175 160,175 170,190 30,190" class="fc-bg"/><text x="100" y="186" text-anchor="middle" class="fc-text" font-size="8">PRINT split</text>
+             <line x1="100" y1="190" x2="100" y2="210" class="fc-line" marker-end="url(#arr10)"/>
+             <ellipse cx="100" cy="225" rx="40" ry="12" class="fc-bg"/><text x="100" y="228" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT bill, tip_pct, people</div>
+          <div style="color:#d97706;">  total = bill + (bill * tip_pct / 100)</div>
+          <div style="color:#d97706;">  per_person = total / people</div>
+          <div style="color:#0ea5e9;">  PRINT per_person</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">bill</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Bill: "</span>))<br>
+          <span class="var">tip</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Tip %: "</span>))<br>
+          <span class="var">ppl</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"People: "</span>))<br>
+          <span class="var">total</span> = <span class="var">bill</span> + (<span class="var">bill</span> * <span class="var">tip</span> / <span class="num">100</span>)<br>
+          <span class="var">split</span> = <span class="var">total</span> / <span class="var">ppl</span><br>
+          <span class="fn">print</span>(<span class="str">"Each pays:"</span>, <span class="var">split</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Bill Amount ($):</span>
+            <input type="number" id="inp-bill" placeholder="e.g. 100" style="width: 60px">
+          </div>
+          <div class="py-input-line">
+            <span>Tip Percentage:</span>
+            <input type="number" id="inp-tip" placeholder="e.g. 15" style="width: 60px">
+          </div>
+          <div class="py-input-line">
+            <span>Number of People:</span>
+            <input type="number" id="inp-ppl" placeholder="e.g. 4" style="width: 60px">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runBill()">▶ Run Program</button>
+          <div id="out-bill" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATM BANKNOTES PROJECT -->
+    <div id="proj-notes" class="project-split" style="display:none;">
+      <div style="grid-column: 1 / -1;" class="mb-3 p-3" style="background:var(--card2); border-left:3px solid var(--accent); border-radius:4px;">
+        <strong class="text-accent">Goal:</strong> Simulate an ATM machine withdrawing money using only $100 bills. Given an amount, find how many $100 bills the ATM dispenses using floor division, and what the remaining unpayable balance is using modulo.
+      </div>
+       <div>
+        <div class="text-sm font-bold text-accent mb-2">1. The Logic</div>
+        <div class="fc-visual mb-2" style="min-height:200px">
+           <svg class="flowchart" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+             <defs><marker id="arr12" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" class="fc-arrow"/></marker></defs>
+             <ellipse cx="100" cy="20" rx="40" ry="12" class="fc-bg"/><text x="100" y="23" text-anchor="middle" class="fc-text" font-size="8">START</text>
+             <line x1="100" y1="32" x2="100" y2="45" class="fc-line" marker-end="url(#arr12)"/>
+             <polygon points="50,50 150,50 160,65 40,65" class="fc-bg"/><text x="100" y="61" text-anchor="middle" class="fc-text" font-size="8">INPUT amount</text>
+             <line x1="100" y1="65" x2="100" y2="80" class="fc-line" marker-end="url(#arr12)"/>
+             <rect x="20" y="85" width="160" height="25" class="fc-bg"/><text x="100" y="100" text-anchor="middle" class="fc-text" font-size="8">hundreds = amount // 100</text>
+             <line x1="100" y1="110" x2="100" y2="125" class="fc-line" marker-end="url(#arr12)"/>
+             <rect x="20" y="130" width="160" height="25" class="fc-bg"/><text x="100" y="145" text-anchor="middle" class="fc-text" font-size="8">remainder = amount % 100</text>
+             <line x1="100" y1="155" x2="100" y2="170" class="fc-line" marker-end="url(#arr12)"/>
+             <polygon points="40,175 160,175 170,190 30,190" class="fc-bg"/><text x="100" y="186" text-anchor="middle" class="fc-text" font-size="8">PRINT hundreds, remainder</text>
+             <line x1="100" y1="190" x2="100" y2="210" class="fc-line" marker-end="url(#arr12)"/>
+             <ellipse cx="100" cy="225" rx="40" ry="12" class="fc-bg"/><text x="100" y="228" text-anchor="middle" class="fc-text" font-size="8">END</text>
+           </svg>
+        </div>
+        <div class="fc-pseudo-body" style="padding:10px; background:var(--code-bg); border-radius:8px; font-size:0.75rem; color:#e8eaf6;">
+          <div>START</div>
+          <div style="color:#0ea5e9;">  INPUT amount</div>
+          <div style="color:#d97706;">  hundreds = amount // 100</div>
+          <div style="color:#d97706;">  remainder = amount % 100</div>
+          <div style="color:#0ea5e9;">  PRINT hundreds, remainder</div>
+          <div>END</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-accent mb-2">2. Python Code</div>
+        <div class="code-block mb-2" style="padding:1rem;">
+          <span class="var">amount</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Amount to withdraw: "</span>))<br>
+          <span class="var">hundreds</span> = <span class="var">amount</span> // <span class="num">100</span><br>
+          <span class="var">remainder</span> = <span class="var">amount</span> % <span class="num">100</span><br>
+          <span class="fn">print</span>(<span class="str">"$100 bills:"</span>, <span class="var">hundreds</span>)<br>
+          <span class="fn">print</span>(<span class="str">"Remaining to pay:"</span>, <span class="var">remainder</span>)
+        </div>
+        <div class="py-console">
+          <div class="text-muted text-xs mb-1">Terminal</div>
+          <div class="py-input-line">
+            <span>Withdraw Amount:</span>
+            <input type="number" id="inp-notes" placeholder="e.g. 350" style="width: 70px">
+          </div>
+          <button class="btn btn-accent btn-sm w-full" onclick="runNotes()">▶ Run Program</button>
+          <div id="out-notes" class="mt-2 text-accent font-bold" style="word-wrap:break-word;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div></section>
+
+<!-- SECTION 12: PYTHON IDE -->
+<section id="s-ide" class="section-alt"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 13</span>
+    <h2 class="section-title">Live Python IDE</h2>
+    <p class="section-desc">Write, test, and run your own Python code right here in the browser! (Powered by Skulpt)</p>
+  </div>
+  <div class="ide-container">
+    <div class="ide-editor-col">
+      <div class="ide-header">📝 main.py</div>
+      <textarea id="ide-code" spellcheck="false"># Write your Python code here!
+name = input("What is your name? ")
+print("Hello", name)
+
+print("\nLet's do some math:")
+a = int(input("Enter a number: "))
+b = int(input("Enter another number: "))
+
+print("Sum:", a + b)
+print("Floor Division:", a // b)</textarea>
+      <button class="btn btn-accent w-full" onclick="runIDE()" style="border-radius: 0 0 var(--radius) 0;">▶ Run Code</button>
+    </div>
+    <div class="ide-output-col">
+      <div class="ide-header">💻 Terminal Output</div>
+      <pre id="ide-output"></pre>
+    </div>
+  </div>
+</div></section>
+
+<!-- SECTION 13: ASSIGNMENTS / TASKS -->
+<section id="s13"><div class="section">
+  <div class="section-header">
+    <span class="section-num">// 14</span>
+    <h2 class="section-title">Your Turn: Assignments</h2>
+    <p class="section-desc">It's time to code! Use the <strong>Live Python IDE</strong> above to solve these challenges using only Math, Variables, and Input/Output.</p>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr; gap:1.5rem;">
+    <!-- Task 1 -->
+    <div class="card" style="border-left:4px solid var(--accent); padding: 1.5rem; background: var(--card);">
+      <h3 style="font-family:var(--font-head); color:var(--text); margin-bottom:10px;">📌 Task 1: Days to Weeks Converter</h3>
+      <p style="color:var(--text2); font-size:0.95rem; margin-bottom:15px;">Ask the user to enter a number of days (e.g., 10). Calculate and print how many full weeks that is, and how many days are left over (e.g., 1 week and 3 days).</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-sm" onclick="toggleHint('hint-1')">💡 Show Hint</button>
+        <button class="btn btn-sm btn-accent" onclick="completeTask(this)">✅ Mark as Done (+10 XP)</button>
+      </div>
+      <div id="hint-1" style="display:none; margin-top:10px; padding:10px; background:var(--code-bg); border-radius:6px; font-size:0.85rem; color:#e8eaf6;">
+        <strong>Hint:</strong> Remember the Length Converter project? A week has 7 days. Use <code>weeks = days // 7</code> and <code>remaining = days % 7</code>.
+      </div>
+    </div>
+
+    <!-- Task 2 -->
+    <div class="card" style="border-left:4px solid var(--accent2); padding: 1.5rem; background: var(--card);">
+      <h3 style="font-family:var(--font-head); color:var(--text); margin-bottom:10px;">📌 Task 2: Triangle Area</h3>
+      <p style="color:var(--text2); font-size:0.95rem; margin-bottom:15px;">Write a program that asks the user for the <code>base</code> and <code>height</code> of a triangle. Calculate the area and print it. <br><em style="font-size:0.85rem">(Formula: Area = 0.5 × base × height)</em></p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-sm" onclick="toggleHint('hint-2')">💡 Show Hint</button>
+        <button class="btn btn-sm btn-accent" onclick="completeTask(this)">✅ Mark as Done (+10 XP)</button>
+      </div>
+      <div id="hint-2" style="display:none; margin-top:10px; padding:10px; background:var(--code-bg); border-radius:6px; font-size:0.85rem; color:#e8eaf6;">
+        <strong>Hint:</strong> Don't forget to use <code>float(input(...))</code> because base and height can be decimals!
+      </div>
+    </div>
+
+    <!-- Task 3 -->
+    <div class="card" style="border-left:4px solid var(--accent3); padding: 1.5rem; background: var(--card);">
+      <h3 style="font-family:var(--font-head); color:var(--text); margin-bottom:10px;">📌 Task 3: Car Mileage</h3>
+      <p style="color:var(--text2); font-size:0.95rem; margin-bottom:15px;">Ask the user for the distance they traveled (in km) and the amount of fuel they used (in liters). Calculate their car's mileage (km per liter) and print it.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-sm" onclick="toggleHint('hint-3')">💡 Show Hint</button>
+        <button class="btn btn-sm btn-accent" onclick="completeTask(this)">✅ Mark as Done (+10 XP)</button>
+      </div>
+      <div id="hint-3" style="display:none; margin-top:10px; padding:10px; background:var(--code-bg); border-radius:6px; font-size:0.85rem; color:#e8eaf6;">
+        <strong>Hint:</strong> Mileage is just division: <code>distance / fuel</code>. Try to print the result in a nice sentence using <code>print("Mileage:", result, "km/l")</code>.
+      </div>
+    </div>
+
+    <!-- Task 4 -->
+    <div class="card" style="border-left:4px solid var(--accent4); padding: 1.5rem; background: var(--card);">
+      <h3 style="font-family:var(--font-head); color:var(--text); margin-bottom:10px;">📌 Task 4: Simple Interest Challenge</h3>
+      <p style="color:var(--text2); font-size:0.95rem; margin-bottom:15px;">Write the code for the Simple Interest project by yourself in the IDE above. Test it with $2000, 5% rate, and 3 years.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-sm" onclick="toggleHint('hint-4')">💡 Show Hint</button>
+        <button class="btn btn-sm btn-accent" onclick="completeTask(this)">✅ Mark as Done (+10 XP)</button>
+      </div>
+      <div id="hint-4" style="display:none; margin-top:10px; padding:10px; background:var(--code-bg); border-radius:6px; font-size:0.85rem; color:#e8eaf6;">
+        <strong>Hint:</strong> Formula is <code>(P * R * T) / 100</code>. Remember to cast all inputs to `float`!
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- FOOTER -->
+<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2rem 1rem;text-align:center">
+  <div style="font-family:var(--font-code);font-size:0.9rem;color:var(--accent); font-weight:bold; letter-spacing:1px; margin-bottom: 1rem;">
+    { py } fundamentals . section_1
+  </div>
+  <div style="font-size:0.9rem;color:var(--text2); line-height: 1.8; margin-bottom: 2rem;">
+    Designed & Built by <strong style="color:var(--text)">Eng. Ahmed El-khatib</strong><br>
+    <span style="font-size:0.8rem;color:var(--text3)">Teaching Assistant @ Faculty of Computers and Information, Luxor University</span>
+  </div>
+  <button onclick="resetCourseProgress()" style="background:none; border:none; color:var(--text3); text-decoration:underline; cursor:pointer; font-size:0.75rem; transition:color 0.3s;">Reset Course Progress (Clear XP)</button>
+</footer>
+
+<script>
+// =========================================
+// PYTHON IDE LOGIC (SKULPT)
+// =========================================
+function builtinRead(x) {
+    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+            throw "File not found: '" + x + "'";
+    return Sk.builtinFiles["files"][x];
+}
+
+function runIDE() {
+    const prog = document.getElementById("ide-code").value;
+    const out = document.getElementById("ide-output");
+    out.innerHTML = ''; // clear previous output
+    
+    // Safety check in case the CDN fails to load Skulpt
+    if (typeof Sk === 'undefined') {
+        out.innerHTML = '<span style="color:var(--accent3)">\nError: Python compiler (Skulpt) failed to load from the CDN.\nPlease check your network connection and try reloading the page.</span>';
+        return;
+    }
+    
+    Sk.pre = "ide-output";
+    Sk.configure({
+        output: function(text) {
+            out.innerHTML += text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        },
+        read: builtinRead,
+        inputfun: function (prompt) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('skulpt-input-modal');
+                const promptEl = document.getElementById('skulpt-prompt');
+                const inputEl = document.getElementById('skulpt-input-val');
+                const submitBtn = document.getElementById('skulpt-submit');
+
+                promptEl.textContent = prompt || "Input required:";
+                inputEl.value = '';
+                modal.style.display = 'flex';
+                inputEl.focus();
+
+                const handleAns = () => {
+                    const val = inputEl.value;
+                    modal.style.display = 'none';
+                    submitBtn.removeEventListener('click', handleAns);
+                    inputEl.removeEventListener('keypress', keyHandler);
+                    
+                    // Echo input to terminal
+                    out.innerHTML += `<span style="color:var(--accent4)">${(prompt || "")}${val}</span>\n`;
+                    resolve(val);
+                };
+
+                const keyHandler = (e) => {
+                    if (e.key === 'Enter') handleAns();
+                };
+
+                submitBtn.addEventListener('click', handleAns);
+                inputEl.addEventListener('keypress', keyHandler);
+            });
+        },
+        inputfunTakesPrompt: true
+    });
+
+    // Run the code
+    const myPromise = Sk.misceval.asyncToPromise(function() {
+        return Sk.importMainWithBody("<stdin>", false, prog, true);
+    });
+    
+    myPromise.then(function(mod) {
+        out.innerHTML += `\n<span style="color:var(--text3)">=== Program Finished ===</span>`;
+        addPoints(5); // Reward for running code!
+    }, function(err) {
+        out.innerHTML += `<span style="color:var(--accent3)">\n${err.toString()}</span>`;
+    });
+}
+
+// =========================================
+// I/O TERMINAL DEMO (S-IO)
+// =========================================
+function runIODemo() {
+  document.getElementById('io-final-out').textContent = '';
+  document.getElementById('io-input-val').value = '';
+  document.getElementById('io-prompt').style.display = 'flex';
+  document.getElementById('io-input-val').focus();
+}
+function finishIODemo() {
+  const inpVal = document.getElementById('io-input-val').value;
+  document.getElementById('io-prompt').style.display = 'none';
+  document.getElementById('io-final-out').innerHTML = `<span style="color:var(--text3); font-weight:normal;">> What is your name? ${inpVal}</span><br>Hello ${inpVal}`;
+  addPoints(3);
+}
+
+// =========================================
+// COMMENTS DEMO (S-COM)
+// =========================================
+function runCommentDemo() {
+  const val = document.getElementById('comment-inp').value.trim();
+  const out = document.getElementById('comment-out');
+  if (val === '#') {
+    out.innerHTML = `<span style="color:var(--text3)">> Starting engine...</span><br><span style="color:var(--accent)">> Engine started successfully! 🚀</span>`;
+    addPoints(4);
+  } else {
+    out.innerHTML = `<span style="color:var(--text3)">> Starting engine...</span><br><span style="color:var(--accent3)">> FATAL ERROR: SELF DESTRUCT INITIATED! 💥</span>`;
+  }
+}
+
+// =========================================
+// TYPE CASTING DEMO (S-CAST)
+// =========================================
+function runCast() {
+  const rawVal = document.getElementById('cast-val').value.trim();
+  const op = document.getElementById('cast-op').value;
+  const resBox = document.getElementById('cast-result');
+  const out = document.getElementById('cast-out');
+  const typeLbl = document.getElementById('cast-type');
+  
+  resBox.style.display = 'block';
+  if(!rawVal) {
+    out.innerHTML = `<span style="color:var(--accent3)">Error: Empty input</span>`; typeLbl.textContent = ""; return;
+  }
+  
+  try {
+    let result, typeStr;
+    if(op === 'int') {
+      result = parseInt(rawVal);
+      if(isNaN(result) || rawVal.includes('.')) throw "ValueError";
+      typeStr = "<class 'int'>";
+    } else if (op === 'float') {
+      result = parseFloat(rawVal);
+      if(isNaN(result)) throw "ValueError";
+      if(Number.isInteger(result)) result = result.toFixed(1);
+      typeStr = "<class 'float'>";
+    } else if (op === 'str') {
+      result = `"${rawVal}"`;
+      typeStr = "<class 'str'>";
+    } else if (op === 'bool') {
+      result = (rawVal === "False" || rawVal === "0" || rawVal === "") ? "False" : "True";
+      typeStr = "<class 'bool'>";
+    }
+    out.innerHTML = result; typeLbl.textContent = `Type identified as: ${typeStr}`; addPoints(2);
+  } catch (e) {
+    out.innerHTML = `<span style="color:var(--accent3)">ValueError!</span>`;
+    typeLbl.innerHTML = `Cannot mathematically convert <code>"${rawVal}"</code> using <code>${op}()</code>`;
+  }
+}
+
+// =========================================
+// THEME TOGGLE
+// =========================================
+function toggleTheme() {
+  const root = document.documentElement;
+  const currentTheme = root.getAttribute('data-theme');
+  if (currentTheme === 'dark') {
+    root.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'light');
+  } else {
+    root.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+  }
+}
+// Apply saved theme on load (Light is default, apply dark if saved)
+if (localStorage.getItem('theme') === 'dark') {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
+
+// =========================================
+// PROGRESS BAR
+// =========================================
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = (scrollTop / docHeight) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// =========================================
+// POINTS SYSTEM
+// =========================================
+let points = parseInt(localStorage.getItem('py_points')) || 0;
+document.getElementById('pts').textContent = points;
+
+function addPoints(n) {
+  points += n;
+  localStorage.setItem('py_points', points);
+  document.getElementById('pts').textContent = points;
+  const badge = document.getElementById('points-badge');
+  badge.classList.remove('gained');
+  void badge.offsetWidth;
+  badge.classList.add('gained');
+}
+
+// =========================================
+// S1: IPO INTERACTIVE
+// =========================================
+let ipoTimer;
+function ipoRun() {
+  const val = document.getElementById('ipo-input-field').value;
+  const out = document.getElementById('ipo-output-area');
+  const steps = [0,1,2,3,4,5].map(i => document.getElementById('step'+i));
+  steps.forEach(s => { s.classList.remove('active','done'); });
+  clearTimeout(ipoTimer);
+  
+  if (!val) {
+    steps[0].classList.add('active');
+    out.innerHTML = '<span class="text-muted text-sm">Waiting for input...</span>';
+    return;
+  }
+  
+  let delay = 0;
+  for (let i = 0; i <= 5; i++) {
+    (function(idx) {
+      setTimeout(() => {
+        steps.forEach((s,j) => { if (j < idx) s.classList.add('done'); s.classList.remove('active'); });
+        steps[idx].classList.add('active');
+        if (idx === 5) { out.innerHTML = `<span class="text-accent font-bold">Hello, ${val}! 👋</span>`; addPoints(1); }
+      }, delay);
+    })(i);
+    delay += 300;
+  }
+}
+
+// =========================================
+// FLOWCHART SIMULATION (S6)
+// =========================================
+const fcState = { avg: 0, speed: 0 };
+function switchFTab(btn, tabId) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.flowchart-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active'); document.getElementById(tabId).classList.add('active');
+}
+function fcStep(name, max) {
+  if (fcState[name] >= max) { 
+     fcState[name] = 0; // reset
+     document.querySelectorAll(`#fc-${name} .fc-shape`).forEach(s => s.classList.remove('active','done'));
+     document.querySelectorAll(`[id^="${name}-p"]`).forEach(p => p.classList.remove('active','done'));
+     return;
+  }
+  const step = fcState[name];
+  
+  const shapes = document.querySelectorAll(`#fc-${name} .fc-shape`);
+  shapes.forEach((s, i) => { s.classList.remove('active'); if (i < step) s.classList.add('done'); else if (i === step) s.classList.add('active'); });
+
+  const allPseudo = document.querySelectorAll(`[id^="${name}-p"]`);
+  allPseudo.forEach((p, i) => { p.classList.remove('active','done'); if (i < step) p.classList.add('done'); else if (i === step) p.classList.add('active'); });
+
+  fcState[name]++;
+  addPoints(1);
+}
+
+// =========================================
+// MEMORY SIMULATOR (S7)
+// =========================================
+const memVars = {};
+function mem_assign() {
+  const n = document.getElementById('mem-name').value.trim();
+  const v = document.getElementById('mem-val').value.trim();
+  if (!n || !v) return;
+  memVars[n] = v;
+  renderMemSlots();
+  addPoints(2);
+  document.getElementById('mem-name').value = '';
+  document.getElementById('mem-val').value = '';
+}
+function renderMemSlots() {
+  const container = document.getElementById('mem-slots');
+  container.innerHTML = '';
+  for (const [name, val] of Object.entries(memVars)) {
+    container.innerHTML += `<div class="mem-slot"><div class="mem-var-name">${name}</div><div class="mem-var-val">${val}</div></div>`;
+  }
+}
+
+// =========================================
+// VARIABLE NAMING GAME (S7)
+// =========================================
+const namingWords = [
+  { word: "user_age", valid: true, reason: "Valid! Uses lowercase and underscores." },
+  { word: "1st_player", valid: false, reason: "Invalid! Cannot start with a number." },
+  { word: "totalScore", valid: true, reason: "Valid! Letters are fine (though snake_case is better)." },
+  { word: "my var", valid: false, reason: "Invalid! Spaces are strictly forbidden." },
+  { word: "user-name", valid: false, reason: "Invalid! Hyphens (-) are treated as subtraction in Python." },
+  { word: "_secret", valid: true, reason: "Valid! Starting with an underscore is perfectly fine." }
+];
+let nameGameIdx = 0;
+function loadNameGame() {
+  document.getElementById('name-game-word').textContent = namingWords[nameGameIdx].word;
+  document.getElementById('name-game-feedback').textContent = '';
+}
+function checkNameGame(choice) {
+  const current = namingWords[nameGameIdx];
+  const fb = document.getElementById('name-game-feedback');
+  if(choice === current.valid) {
+    fb.innerHTML = `<span style="color:var(--accent)">✅ Correct!</span> ${current.reason}`;
+    addPoints(2);
+  } else {
+    fb.innerHTML = `<span style="color:var(--accent3)">❌ Oops!</span> ${current.reason}`;
+  }
+  nameGameIdx = (nameGameIdx + 1) % namingWords.length;
+  setTimeout(loadNameGame, 2500);
+}
+loadNameGame();
+
+// =========================================
+// DATA TYPE DETECTOR (S8)
+// =========================================
+function detectType() {
+  const v = document.getElementById('type-input').value.trim();
+  const res = document.getElementById('type-result');
+  ['ti-int','ti-float','ti-str','ti-bool'].forEach(id => document.getElementById(id).style.borderColor = 'var(--border)');
+  if(!v) return;
+
+  let type = 'str', id = 'ti-str', emoji='📝';
+  if (v === 'True' || v === 'False') { type = 'bool'; id = 'ti-bool'; emoji='⚡'; }
+  else if (/^-?\d+$/.test(v)) { type = 'int'; id = 'ti-int'; emoji='🔢'; }
+  else if (/^-?\d+\.\d+$/.test(v)) { type = 'float'; id = 'ti-float'; emoji='🌊'; }
+
+  document.getElementById(id).style.borderColor = 'var(--accent)';
+  res.innerHTML = `<span style="font-size:3rem;margin-bottom:10px">${emoji}</span><div class="mono font-bold text-accent" style="font-size:1.5rem">${type}</div>`;
+  addPoints(1);
+}
+
+// =========================================
+// ARITHMETIC CALCULATOR (S9)
+// =========================================
+let currentOp = '+';
+const opExplain = {
+  '+':  { sym: '+',  name: 'Addition',        desc: 'Adds two numbers together', pyop: '+' },
+  '-':  { sym: '−',  name: 'Subtraction',     desc: 'Subtracts B from A', pyop: '-' },
+  '*':  { sym: '×',  name: 'Multiplication',  desc: 'Multiplies two numbers', pyop: '*' },
+  '/':  { sym: '÷',  name: 'Division',        desc: 'Divides A by B (decimal result)', pyop: '/' },
+  '//': { sym: '÷÷', name: 'Floor Division',  desc: 'Divides and drops the decimal part completely', pyop: '//' },
+  '%':  { sym: '%',  name: 'Modulo',          desc: 'Returns the REMAINDER after division', pyop: '%' },
+  '**': { sym: '^',  name: 'Exponentiation',  desc: 'Raises A to the power of B', pyop: '**' },
+};
+
+function calcOp(btn, op) {
+  document.querySelectorAll('.op-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentOp = op;
+  calcUpdate();
+}
+
+function calcUpdate() {
+  const a = parseFloat(document.getElementById('calc-a').value) || 0;
+  const b = parseFloat(document.getElementById('calc-b').value) || 0;
+  const info = opExplain[currentOp];
+  let result;
+  try {
+    if (currentOp === '//' ) result = Math.floor(a / b);
+    else if (currentOp === '%')  result = a % b;
+    else if (currentOp === '**') result = Math.pow(a, b);
+    else if (currentOp === '/')  result = (b === 0) ? 'Error: ÷0' : a / b;
+    else if (currentOp === '+')  result = a + b;
+    else if (currentOp === '-')  result = a - b;
+    else if (currentOp === '*')  result = a * b;
+  } catch(e) { result = 'Error'; }
+
+  const res = typeof result === 'number' ? (Number.isInteger(result) ? result : result.toFixed(4)) : result;
+  document.getElementById('calc-expr').textContent = `${a} ${info.sym} ${b}`;
+  const resEl = document.getElementById('calc-result');
+  resEl.textContent = `= ${res}`;
+  resEl.classList.remove('pop');
+  void resEl.offsetWidth;
+  resEl.classList.add('pop');
+  document.getElementById('calc-explain').textContent = `${info.name}: ${info.desc}`;
+  document.getElementById('calc-py').innerHTML = `<span class="var">result</span> = <span class="num">${a}</span> <span style="color:var(--accent4)">${info.pyop}</span> <span class="num">${b}</span>  <span class="cmt"># = ${res}</span>`;
+  addPoints(1);
+}
+// Run once on load
+calcUpdate();
+
+// =========================================
+// STRING MAGIC (S-STRING)
+// =========================================
+let strCurrentOp = '+';
+function setStringOp(op) {
+  document.getElementById('btn-str-add').classList.remove('active');
+  document.getElementById('btn-str-mul').classList.remove('active');
+  if (op === '+') {
+    document.getElementById('btn-str-add').classList.add('active');
+    document.getElementById('str-add-div').style.display = 'flex';
+    document.getElementById('str-mul-div').style.display = 'none';
+  } else {
+    document.getElementById('btn-str-mul').classList.add('active');
+    document.getElementById('str-add-div').style.display = 'none';
+    document.getElementById('str-mul-div').style.display = 'flex';
+  }
+  strCurrentOp = op;
+  updateStringMagic();
+}
+
+function updateStringMagic() {
+  const w1 = document.getElementById('str-word').value || "";
+  const w2 = document.getElementById('str-word2').value || "";
+  const num = parseInt(document.getElementById('str-num').value) || 0;
+  
+  let expr, res, pyCode;
+  
+  if (strCurrentOp === '+') {
+    expr = `"${w1}" + "${w2}"`;
+    res = w1 + w2;
+    pyCode = `<span class="var">res</span> = <span class="str">"${w1}"</span> + <span class="str">"${w2}"</span>`;
+  } else {
+    expr = `"${w1}" * ${num}`;
+    res = w1.repeat(Math.max(0, num));
+    if (res.length > 100) res = res.substring(0, 100) + "... (truncated)";
+    pyCode = `<span class="var">res</span> = <span class="str">"${w1}"</span> * <span class="num">${num}</span>`;
+  }
+  
+  document.getElementById('str-expr').textContent = expr;
+  const resEl = document.getElementById('str-result');
+  resEl.textContent = `= "${res}"`;
+  resEl.classList.remove('pop');
+  void resEl.offsetWidth;
+  resEl.classList.add('pop');
+  document.getElementById('str-py').innerHTML = pyCode;
+  addPoints(1);
+}
+updateStringMagic();
+
+// =========================================
+// LOGIC SIMULATOR (S10)
+// =========================================
+function updateLogic() {
+  const age   = document.getElementById('t-age').checked;
+  const hasId = document.getElementById('t-id').checked;
+  const guest = document.getElementById('t-guest').checked;
+  const allowed = (age && hasId) || guest;
+  const box = document.getElementById('logic-result');
+  const icon = document.getElementById('logic-icon');
+  const text = document.getElementById('logic-text');
+  const expr = document.getElementById('logic-expr');
+
+  box.className = 'logic-result-box ' + (allowed ? 'allowed' : 'denied');
+  icon.textContent = allowed ? '✅' : '🚫';
+  text.textContent = allowed ? 'Entry Allowed!' : 'Entry Denied';
+  text.style.color = allowed ? 'var(--accent)' : 'var(--accent3)';
+  expr.textContent = `(${age?'T':'F'} AND ${hasId?'T':'F'}) OR ${guest?'T':'F'} = ${allowed?'True':'False'}`;
+
+  // Highlight truth table row
+  const rows = document.querySelectorAll('#logic-tbody tr');
+  rows.forEach(r => r.classList.remove('active-row'));
+  // Find matching row
+  const key = `${age?'T':'F'}${hasId?'T':'F'}${guest?'T':'F'}`;
+  const rowMap = { 'FFF':0,'TFF':1,'TTF':2,'FFT':3,'TTT':4 };
+  if (rowMap[key] !== undefined) rows[rowMap[key]].classList.add('active-row');
+
+  addPoints(1);
+}
+
+// =========================================
+// PRACTICAL PROJECTS (S11)
+// =========================================
+function switchProj(btn, id) {
+  document.querySelectorAll('#s11 .ftab').forEach(t => t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  
+  document.getElementById('proj-temp').style.display = 'none';
+  document.getElementById('proj-area').style.display = 'none';
+  document.getElementById('proj-bmi').style.display = 'none';
+  document.getElementById('proj-vote').style.display = 'none';
+  document.getElementById('proj-salary').style.display = 'none';
+  document.getElementById('proj-discount').style.display = 'none';
+  document.getElementById('proj-length').style.display = 'none';
+  document.getElementById('proj-interest').style.display = 'none';
+  document.getElementById('proj-bill').style.display = 'none';
+  document.getElementById('proj-notes').style.display = 'none';
+  
+  document.getElementById(id).style.display = 'grid';
+}
+
+function runTemp() {
+  const c = parseFloat(document.getElementById('inp-c').value);
+  if(isNaN(c)) return;
+  const f = (c * 9/5) + 32;
+  document.getElementById('out-temp').innerHTML = `> Fahrenheit: ${f.toFixed(2)}`;
+  addPoints(5);
+}
+
+function runArea() {
+  const r = parseFloat(document.getElementById('inp-area').value);
+  if(isNaN(r)) return;
+  const area = 3.14159 * (r * r);
+  document.getElementById('out-area').innerHTML = `> Area: ${area.toFixed(2)}`;
+  addPoints(5);
+}
+
+function runBMI() {
+  const w = parseFloat(document.getElementById('inp-w').value);
+  const h = parseFloat(document.getElementById('inp-h').value);
+  if(isNaN(w) || isNaN(h) || h <= 0) return;
+  const bmi = w / (h * h);
+  document.getElementById('out-bmi').innerHTML = `> BMI: ${bmi.toFixed(1)}`;
+  addPoints(5);
+}
+
+function runVote() {
+  const age = parseInt(document.getElementById('inp-age').value);
+  if(isNaN(age)) return;
+  const isEligible = age >= 18;
+  document.getElementById('out-vote').innerHTML = `> Can vote: <span style="color:var(--accent)">${isEligible}</span>`;
+  addPoints(5);
+}
+
+function runSalary() {
+  const hours = parseFloat(document.getElementById('inp-hrs').value);
+  const rate = parseFloat(document.getElementById('inp-rate').value);
+  if(isNaN(hours) || isNaN(rate) || hours < 0 || rate < 0) return;
+  
+  const salary = hours * rate;
+  document.getElementById('out-salary').innerHTML = `> <span style="color:var(--accent)">Success!</span> Total Salary: $${salary.toFixed(2)}`;
+  addPoints(5);
+}
+
+function runDiscount() {
+  const price = parseFloat(document.getElementById('inp-price').value);
+  const disc = parseFloat(document.getElementById('inp-disc').value);
+  if(isNaN(price) || isNaN(disc) || price < 0 || disc < 0) return;
+  
+  const saving = price * (disc / 100);
+  const finalPrice = price - saving;
+  document.getElementById('out-disc').innerHTML = `> Savings: $${saving.toFixed(2)}<br>> Final Price: $${finalPrice.toFixed(2)} 🏷️`;
+  addPoints(5);
+}
+
+function runLength() {
+  const tcm = parseInt(document.getElementById('inp-length').value);
+  if(isNaN(tcm) || tcm < 0) return;
+  const m = Math.floor(tcm / 100);
+  const cm = tcm % 100;
+  document.getElementById('out-length').innerHTML = `> ${m} meters and ${cm} cm 📏`;
+  addPoints(5);
+}
+
+function runInterest() {
+  const p = parseFloat(document.getElementById('inp-p').value);
+  const r = parseFloat(document.getElementById('inp-r').value);
+  const t = parseFloat(document.getElementById('inp-t').value);
+  if(isNaN(p) || isNaN(r) || isNaN(t) || p < 0 || r < 0 || t < 0) return;
+  const interest = (p * r * t) / 100;
+  const total = p + interest;
+  document.getElementById('out-interest').innerHTML = `> Earned Interest: $${interest.toFixed(2)} 📈<br>> Total Balance: $${total.toFixed(2)} 💰`;
+  addPoints(5);
+}
+
+function runBill() {
+  const bill = parseFloat(document.getElementById('inp-bill').value);
+  const tip = parseFloat(document.getElementById('inp-tip').value);
+  const ppl = parseInt(document.getElementById('inp-ppl').value);
+  if(isNaN(bill) || isNaN(tip) || isNaN(ppl) || ppl <= 0) return;
+  const total = bill + (bill * tip / 100);
+  const split = total / ppl;
+  document.getElementById('out-bill').innerHTML = `> Each pays: $${split.toFixed(2)} 💸`;
+  addPoints(5);
+}
+
+function runNotes() {
+  const amt = parseInt(document.getElementById('inp-notes').value);
+  if(isNaN(amt) || amt < 0) return;
+  const h = Math.floor(amt / 100);
+  const r = amt % 100;
+  document.getElementById('out-notes').innerHTML = `> $100 Bills: ${h} 💵<br>> Remainder: $${r} 🪙`;
+  addPoints(5);
+}
+
+// TASKS & MISC
+function toggleHint(id) {
+  const hint = document.getElementById(id);
+  if (hint.style.display === "none") {
+    hint.style.display = "block";
+    addPoints(1); 
+  } else {
+    hint.style.display = "none";
+  }
+}
+
+function completeTask(btn) {
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.style.background = 'transparent';
+  btn.style.borderColor = 'var(--border)';
+  btn.style.color = 'var(--text2)';
+  btn.innerHTML = 'Completed 🏆';
+  addPoints(10);
+}
+
+function resetCourseProgress() {
+  if(confirm("Are you sure you want to reset your XP and course progress?")) {
+    localStorage.removeItem('py_points');
+    window.location.reload();
+  }
+}
+</script>
+</body>
+</html>
