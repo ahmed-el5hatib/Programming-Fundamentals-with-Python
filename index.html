@@ -279,6 +279,67 @@ h1.hero-title {
 .expl-body ul { padding-left: 1.5rem; margin-bottom: 0.5rem; }
 .expl-body li { margin-bottom: 0.3rem; }
 
+/* =========================================
+   NEW: IPO INFOGRAPH STYLES
+   ========================================= */
+.ipo-infograph {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0 1rem 0;
+  text-align: center;
+}
+.ipo-node {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem 1rem;
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+.ipo-node:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+.ipo-node.in { border-bottom: 4px solid var(--accent2); }
+.ipo-node.proc { border-bottom: 4px solid var(--accent5); }
+.ipo-node.out { border-bottom: 4px solid var(--accent); }
+
+.ipo-node-icon { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+.ipo-node-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  color: var(--text);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.ipo-node-desc { font-size: 0.85rem; color: var(--text2); line-height: 1.5; }
+
+.ipo-arrow-inf {
+  font-size: 2rem;
+  color: var(--text3);
+  animation: pulseArrow 1.5s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes pulseArrow {
+  0%, 100% { opacity: 0.4; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(5px); color: var(--accent); }
+}
+
+@media (max-width: 768px) {
+  .ipo-infograph { flex-direction: column; }
+  .ipo-arrow-inf { transform: rotate(90deg); margin: 0.5rem 0; }
+  @keyframes pulseArrow {
+    0%, 100% { opacity: 0.4; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(5px); color: var(--accent); }
+  }
+}
+
 /* DEMO BOX */
 .demo-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem;}
 .demo-header { background: var(--card2); border-bottom: 1px solid var(--border); padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-code); font-size: 0.75rem; color: var(--text2); }
@@ -513,7 +574,7 @@ svg.flowchart .fc-arrow { fill: var(--border); transition: fill 0.3s;}
   </div>
 </section>
 
-<!-- S1: HOW COMPUTERS THINK -->
+<!-- S1: HOW COMPUTERS THINK (UPDATED WITH INFOGRAPHIC) -->
 <section id="s1"><div class="section">
   <div class="section-header">
     <span class="section-num">// 01</span>
@@ -523,15 +584,40 @@ svg.flowchart .fc-arrow { fill: var(--border); transition: fill 0.3s;}
     <div class="expl-header">📖 Theory Check: The I-P-O Model</div>
     <div class="expl-body">
       <p>Computers are incredibly fast, but they aren't "smart" out of the box. They follow a strict, 3-step lifecycle for absolutely everything they do. This is known as the <strong>IPO Model</strong>:</p>
-      <ul>
-        <li><strong>📥 Input:</strong> This is how the computer receives raw data from the outside world. Examples include typing on a keyboard, clicking a mouse, a microphone picking up your voice, or swiping a credit card.</li>
-        <li><strong>⚙️ Process:</strong> The "Brain" of the computer (the CPU) takes that raw data and does something with it based on specific rules. It calculates numbers, checks if passwords match, or applies filters to an image.</li>
-        <li><strong>🖥️ Output:</strong> Showing the final, processed result back to the user. This could be displaying text on a screen, playing a sound through speakers, or printing a receipt.</li>
-      </ul>
+      
+      <!-- NEW IPO INFOGRAPHIC -->
+      <div class="ipo-infograph">
+        <!-- Input Node -->
+        <div class="ipo-node in">
+          <span class="ipo-node-icon">📥</span>
+          <div class="ipo-node-title text-accent2">1. Input</div>
+          <div class="ipo-node-desc">Receiving raw data from the outside world (Keyboard, Mouse, Mic).</div>
+        </div>
+        
+        <div class="ipo-arrow-inf">➔</div>
+        
+        <!-- Process Node -->
+        <div class="ipo-node proc">
+          <span class="ipo-node-icon">⚙️</span>
+          <div class="ipo-node-title" style="color: var(--accent5)">2. Process</div>
+          <div class="ipo-node-desc">The CPU calculating, comparing, and applying logic to the data.</div>
+        </div>
+        
+        <div class="ipo-arrow-inf">➔</div>
+        
+        <!-- Output Node -->
+        <div class="ipo-node out">
+          <span class="ipo-node-icon">🖥️</span>
+          <div class="ipo-node-title text-accent">3. Output</div>
+          <div class="ipo-node-desc">Showing the final processed result back to the user (Screen, Speaker).</div>
+        </div>
+      </div>
+      <!-- END IPO INFOGRAPHIC -->
+
       <p><strong>Real-World Analogy (The ATM Machine):</strong><br>
       • <em>Input:</em> You insert your card and type your PIN.<br>
-      • <em>Process:</em> The bank's computer verifies your PIN and checks if you have enough balance.<br>
-      • <em>Output:</em> The machine dispenses your cash and prints a receipt.</p>
+      • <em>Process:</em> The bank's computer verifies your PIN and checks your balance.<br>
+      • <em>Output:</em> The machine dispenses cash and prints a receipt.</p>
     </div>
   </div>
 
